@@ -1,0 +1,1 @@
+profiiliInfo = {'Nimi': 'NULL', 'Ika': 'NULL', 'Ammatti': 'NULL'}
