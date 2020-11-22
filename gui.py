@@ -7,7 +7,7 @@ from tkinter import messagebox
 import profile as profile
 
 # Tuo transaction-tiedosto, joka sisältää maksutapahtumiin liittyvät luokat ja metodit
-import transaktio as transaction
+import transaction as transaction
 
 # Tuo sys ohjelman sammuttamista varten
 import sys
@@ -18,33 +18,33 @@ class GUI():
         root.destroy()
         sys.exit()
 
-    def paivitaTransaktiot(self, action, totalIncome, totalExpenses):
+    def updateTransactions(self, action, totalIncome, totalExpenses):
         if action == 'lisaa':
-            tapahtumaIkkuna = transaction.lisaaTransaktioGUI(root, self.transactionList)
-            tapahtumaIkkuna.wait_window(tapahtumaIkkuna)
+            eventWindow = transaction.addTransactionEventWindow(root, self.transactionList)
+            eventWindow.wait_window(eventWindow)
             print("Tapahtuma lisätty!")
 
             self.totalIncome = 0
             self.totalExpenses = 0
             for i in range(len(self.transactionList)):
                 # Päivitä recent-paneeli
-                recentItem = ttk.Label(self.recent, text=self.transactionList[i].pvm)
+                recentItem = ttk.Label(self.recent, text=self.transactionList[i].date)
                 recentItem.grid(column=0, row=i+2)
 
-                maaraTeksti = self.transactionList[i].maara, "€"
-                recentItem = ttk.Label(self.recent, text=maaraTeksti)
+                recentAmount = self.transactionList[i].amount, "€"
+                recentItem = ttk.Label(self.recent, text=recentAmount)
                 recentItem.grid(column=1, row=i+2)
 
-                recentItem = ttk.Label(self.recent, text=self.transactionList[i].kuvaus)
+                recentItem = ttk.Label(self.recent, text=self.transactionList[i].description)
                 recentItem.grid(column=2, row=i+2)
 
                 # Päivitä yleiskatsaus paneeli
-                if self.transactionList[i].maara >= 0:
-                    self.totalIncome += self.transactionList[i].maara
+                if self.transactionList[i].amount >= 0:
+                    self.totalIncome += self.transactionList[i].amount
                     self.guiIncome.set(self.totalIncome)
 
-                elif self.transactionList[i].maara < 0:
-                    self.totalExpenses += self.transactionList[i].maara
+                elif self.transactionList[i].amount < 0:
+                    self.totalExpenses += self.transactionList[i].amount
                     self.guiExpenses.set(self.totalExpenses)
 
                 else:
@@ -103,7 +103,7 @@ class GUI():
         self.panelLabel = ttk.Label(self.panel, text="Hallintapaneeli")
         self.panelLabel.grid(column=0, row=0)
 
-        self.addTransactionButton = Button(self.panel, text="Lisää transaktio", command=lambda: self.paivitaTransaktiot('lisaa', self.totalIncome, self.totalExpenses))
+        self.addTransactionButton = Button(self.panel, text="Lisää transaktio", command=lambda: self.updateTransactions('lisaa', self.totalIncome, self.totalExpenses))
         self.removeTransactionButton = Button(self.panel, text="Poista transaktio", command="")
 
         self.importButton = Button(self.panel, text="Tuo tiedosto", command="")
