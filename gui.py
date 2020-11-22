@@ -11,13 +11,17 @@ import transaction as transaction
 
 # Tuo sys ohjelman sammuttamista varten
 import sys
-        
+import datetime as date
+
 class GUI():
+    # Luo popup-ikkuna, jonka jälkeen tuhoa ikkuna ja sammuta ohjelma
     def exit(self):
         messagebox.showinfo("Budjetoija", "Ohjelma sammutetaan.")
         root.destroy()
         sys.exit()
 
+    # Päivitä maksutapahtumat käymällä lista läpi
+    # Päivitä käyttöliittymästä overview- ja recent-paneelit
     def updateTransactions(self, action, totalIncome, totalExpenses):
         if action == 'lisaa':
             eventWindow = transaction.addTransactionEventWindow(root, self.transactionList)
@@ -28,11 +32,12 @@ class GUI():
             self.totalExpenses = 0
             for i in range(len(self.transactionList)):
                 # Päivitä recent-paneeli
-                recentItem = ttk.Label(self.recent, text=self.transactionList[i].date)
+                dateText = self.transactionList[i].date.strftime("%d/%m/%Y")
+                recentItem = ttk.Label(self.recent, text=dateText)
                 recentItem.grid(column=0, row=i+2)
 
-                recentAmount = self.transactionList[i].amount, "€"
-                recentItem = ttk.Label(self.recent, text=recentAmount)
+                amountText = self.transactionList[i].amount, "€"
+                recentItem = ttk.Label(self.recent, text=amountText)
                 recentItem.grid(column=1, row=i+2)
 
                 recentItem = ttk.Label(self.recent, text=self.transactionList[i].description)
@@ -56,6 +61,8 @@ class GUI():
         self.root = root
         root.title("Budjetoija")
 
+        # Muuttujat overview-paneelin tuloille, menoille ja tulokselle
+        # StringVar() on Tkinterin metodi, joka luo muuttujan, joka päivittää arvon käyttöliittymään automaattisesti, kun muuttujaa muutetaan
         self.guiIncome = StringVar()
         self.guiExpenses = StringVar()
         self.totalIncome = 0

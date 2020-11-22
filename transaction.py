@@ -3,11 +3,15 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import simpledialog
+import datetime as date
 
 class Transaction:
 
     def __init__(self, date, amount, description):
-        self.date = date
+        separatedDate = date.split(".")
+
+        dateObject = date.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
+        self.date = dateObject
         self.amount = amount
         if amount >= 0:
             self.sign = "TULO"
@@ -15,6 +19,7 @@ class Transaction:
             self.sign = "MENO"
         self.description = description
 
+# Luo transaction-objekti (maksutapahtuma) ja lisää se transactionList-listaan (maksutapahtumien lista)
 def createTransaction(date, amount, description, transactionList, eventWindow):
     transactionObject = Transaction(date, int(amount), description)
     print(transactionObject, transactionObject.date, transactionObject.amount, transactionObject.description)
@@ -23,6 +28,7 @@ def createTransaction(date, amount, description, transactionList, eventWindow):
 
     eventWindow.destroy()
 
+# Luo ikkuna maksutapahtuman lisäämiseksi
 def addTransactionEventWindow(root, transactionList):
     window = Toplevel(root)
     window.title("Lisää maksutapahtuma.")
