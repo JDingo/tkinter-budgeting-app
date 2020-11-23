@@ -3,14 +3,15 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import simpledialog
-import datetime as date
+import datetime as dt
 
 class Transaction:
 
     def __init__(self, date, amount, description):
         separatedDate = date.split(".")
+        print(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
 
-        dateObject = date.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
+        dateObject = dt.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
         self.date = dateObject
         self.amount = amount
         if amount >= 0:

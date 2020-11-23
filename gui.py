@@ -11,7 +11,7 @@ import transaction as transaction
 
 # Tuo sys ohjelman sammuttamista varten
 import sys
-import datetime as date
+import datetime as dt
 
 class GUI():
     # Luo popup-ikkuna, jonka jälkeen tuhoa ikkuna ja sammuta ohjelma
@@ -20,11 +20,16 @@ class GUI():
         root.destroy()
         sys.exit()
 
+    def updateInfo(self):
+        eventWindow = profile.editInfoEventWindow(self.root, self.userName, self.userAge)
+        eventWindow.wait_window(eventWindow)
+        print("Muokattu info!")
+
     # Päivitä maksutapahtumat käymällä lista läpi
     # Päivitä käyttöliittymästä overview- ja recent-paneelit
     def updateTransactions(self, action, totalIncome, totalExpenses):
         if action == 'lisaa':
-            eventWindow = transaction.addTransactionEventWindow(root, self.transactionList)
+            eventWindow = transaction.addTransactionEventWindow(self.root, self.transactionList)
             eventWindow.wait_window(eventWindow)
             print("Tapahtuma lisätty!")
 
@@ -61,6 +66,12 @@ class GUI():
         self.root = root
         root.title("Budjetoija")
 
+        # Muuttujat info-paneelin tiedoille
+        self.userName = StringVar()
+        self.userAge = StringVar()
+        self.userName.set("")
+        self.userAge.set("")
+
         # Muuttujat overview-paneelin tuloille, menoille ja tulokselle
         # StringVar() on Tkinterin metodi, joka luo muuttujan, joka päivittää arvon käyttöliittymään automaattisesti, kun muuttujaa muutetaan
         self.guiIncome = StringVar()
@@ -94,17 +105,18 @@ class GUI():
         self.infoLabel = ttk.Label(self.info, text="Info")
         self.infoLabel.grid(column=0, row=0, sticky="nw")
 
-        self.nameLabel = "Nimi: " + profile.profiiliInfo['Nimi']
-        self.infoName = ttk.Label(self.info, text=self.nameLabel)
+        self.nameLabel = ttk.Label(self.info, textvariable=self.userName)
+        self.infoName = ttk.Label(self.info, text="Nimi:")
         self.infoName.grid(column=1, row=1, sticky="nw")
+        self.nameLabel.grid(column=2, row=1, sticky="nw")
 
-        self.ageLabel = "Ikä: " + profile.profiiliInfo['Ika']
-        self.infoAge = ttk.Label(self.info, text=self.ageLabel)
+        self.ageLabel = ttk.Label(self.info, textvariable=self.userAge)
+        self.infoAge = ttk.Label(self.info, text="Ikä")
         self.infoAge.grid(column=1, row=2, sticky="nw")
+        self.ageLabel.grid(column=2, row=2, sticky="nw")
 
-        self.occupationLabel = "Ammatti: " + profile.profiiliInfo['Ammatti']
-        self.infoOccupation = ttk.Label(self.info, text=self.occupationLabel)
-        self.infoOccupation.grid(column=1, row=3, sticky="nw")
+        self.editButton = Button(self.info, text="Muokkaa", command = lambda : self.updateInfo())
+        self.editButton.grid(column=1, row=0)
 
         # Panel-paneelin sisältö
         self.panelLabel = ttk.Label(self.panel, text="Hallintapaneeli")
