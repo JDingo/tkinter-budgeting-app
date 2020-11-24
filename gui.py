@@ -32,35 +32,38 @@ class GUI():
             eventWindow = transaction.addTransactionEventWindow(self.root, self.transactionList)
             eventWindow.wait_window(eventWindow)
             print("Tapahtuma lisätty!")
+            self.printTransactions(self.recent)
 
-            self.totalIncome = 0
-            self.totalExpenses = 0
-            for i in range(len(self.transactionList)):
-                # Päivitä recent-paneeli
-                dateText = self.transactionList[i].date.strftime("%d/%m/%Y")
-                recentItem = ttk.Label(self.recent, text=dateText)
-                recentItem.grid(column=0, row=i+2)
+    # Tulosta maksutapahtumat syötetylle ikkunalle masterWindow
+    def printTransactions(self, masterWindow):
+        self.totalIncome = 0
+        self.totalExpenses = 0
+        for i in range(len(self.transactionList)):
+            # Päivitä recent-paneeli
+            dateText = self.transactionList[i].date.strftime("%d/%m/%Y")
+            recentItem = ttk.Label(masterWindow, text=dateText)
+            recentItem.grid(column=0, row=i+2)
 
-                amountText = self.transactionList[i].amount, "€"
-                recentItem = ttk.Label(self.recent, text=amountText)
-                recentItem.grid(column=1, row=i+2)
+            amountText = self.transactionList[i].amount, "€"
+            recentItem = ttk.Label(masterWindow, text=amountText)
+            recentItem.grid(column=1, row=i+2)
 
-                recentItem = ttk.Label(self.recent, text=self.transactionList[i].description)
-                recentItem.grid(column=2, row=i+2)
+            recentItem = ttk.Label(masterWindow, text=self.transactionList[i].description)
+            recentItem.grid(column=2, row=i+2)
 
-                # Päivitä yleiskatsaus paneeli
-                if self.transactionList[i].amount >= 0:
-                    self.totalIncome += self.transactionList[i].amount
-                    self.guiIncome.set(self.totalIncome)
+            # Päivitä yleiskatsaus paneeli
+            if self.transactionList[i].amount >= 0:
+                self.totalIncome += self.transactionList[i].amount
+                self.guiIncome.set(self.totalIncome)
 
-                elif self.transactionList[i].amount < 0:
-                    self.totalExpenses += self.transactionList[i].amount
-                    self.guiExpenses.set(self.totalExpenses)
+            elif self.transactionList[i].amount < 0:
+                self.totalExpenses += self.transactionList[i].amount
+                self.guiExpenses.set(self.totalExpenses)
 
-                else:
-                    pass
+            else:
+                pass
 
-                self.balance.set(self.totalIncome + self.totalExpenses)
+            self.balance.set(self.totalIncome + self.totalExpenses)
 
     def __init__(self, root):
         self.root = root
