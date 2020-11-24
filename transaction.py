@@ -32,7 +32,7 @@ def createTransaction(date, amount, description, transactionList, eventWindow):
 # Luo ikkuna maksutapahtuman lisäämiseksi
 def addTransactionEventWindow(root, transactionList):
     window = Toplevel(root)
-    window.title("Lisää maksutapahtuma.")
+    window.title("Lisää maksutapahtuma")
     
     dateLabel = Label(window, text="Päivämäärä [dd.mm.yyyy]:")
     dateEntry = Entry(window)
@@ -55,5 +55,20 @@ def addTransactionEventWindow(root, transactionList):
 
     addButton.grid(row=3, column=0)
     exitButton.grid(row=3, column=1)
+
+    return window
+
+def removeTransactionEventWindow(root):
+    window = Toplevel(root)
+    window.title("Poista maksutapahtumia")
+
+    incomeFrame = ttk.Frame(window, borderwidth=2, relief="sunken", width=50, height=200)
+    expensesFrame = ttk.Frame(window, borderwidth=2, relief="sunken", width=50, height=200)
+
+    incomeFrame.grid(column=1, row=1)
+    expensesFrame.grid(column=2, row=1)
+
+    exitButton = Button(window, text="Poistu", command = window.destroy)
+    exitButton.grid(column=0, row=1)
 
     return window
