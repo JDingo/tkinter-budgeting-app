@@ -58,7 +58,8 @@ def addTransactionEventWindow(root, transactionList):
 
     return window
 
-def removeTransactionEventWindow(root):
+# Luo ikkuna maksutapahtumien poistoa varten
+def removeTransactionEventWindow(root, systemObject):
     window = Toplevel(root)
     window.title("Poista maksutapahtumia")
 
@@ -79,4 +80,42 @@ def removeTransactionEventWindow(root):
     exitButton = Button(window, text="Poistu", command = window.destroy)
     exitButton.grid(column=0, row=1, sticky="nw")
 
+    populateRemoveWindow(window, systemObject, incomeFrame, expensesFrame)
+
     return window
+
+def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
+    print(systemObject.transactionList)
+
+    incomeList = []
+    expensesList = []
+
+    for transaction in systemObject.transactionList:
+        if transaction.sign == "TULO":
+            incomeList.append(transaction)
+        else:
+            expensesList.append(transaction)
+
+    for i, transaction in enumerate(incomeList):
+        dateText = transaction.date.strftime("%d/%m/%Y")
+        recentItem = ttk.Label(incomeFrame, text=dateText)
+        recentItem.grid(column=0, row=i)
+
+        amountText = transaction.amount, "€"
+        recentItem = ttk.Label(incomeFrame, text=amountText)
+        recentItem.grid(column=1, row=i)
+
+        recentItem = ttk.Label(incomeFrame, text=transaction.description)
+        recentItem.grid(column=2, row=i)
+
+    for i, transaction in enumerate(expensesList):
+        dateText = transaction.date.strftime("%d/%m/%Y")
+        recentItem = ttk.Label(expensesFrame, text=dateText)
+        recentItem.grid(column=0, row=i)
+
+        amountText = transaction.amount, "€"
+        recentItem = ttk.Label(expensesFrame, text=amountText)
+        recentItem.grid(column=1, row=i)
+
+        recentItem = ttk.Label(expensesFrame, text=transaction.description)
+        recentItem.grid(column=2, row=i)

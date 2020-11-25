@@ -66,7 +66,7 @@ class GUI():
             self.balance.set(self.totalIncome + self.totalExpenses)
 
     def removeTransactions(self):
-        eventWindow = transaction.removeTransactionEventWindow(self.root)
+        eventWindow = transaction.removeTransactionEventWindow(self.root, self)
         eventWindow.wait_window(eventWindow)
         print("Poistotapahtuma suoritettu!")
 
