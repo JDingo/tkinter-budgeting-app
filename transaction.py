@@ -124,10 +124,21 @@ def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
 
 def exportTransactions(transactionsList):
     objectList = []
-    with open("transactionData.json","w") as tiedosto:
+    with open("transactionData.json","w") as transactionFile:
         for i in transactionsList:
             stringDate = i.date.strftime("%d.%m.%Y")
             data = {"date": stringDate, "amount": i.amount, "sign": i.sign, "description": i.description}
             objectList.append(data)
 
-        json.dump(objectList, tiedosto)
+        json.dump(objectList, transactionFile)
+
+def importTransactions(transactionsList):
+    transactionsList = []
+    with open("transactionData.json","r") as transactionFile:
+        fileList = json.load(transactionFile)
+        print(fileList)
+        for transaction in fileList:
+            transactionObject = Transaction(transaction["date"], transaction["amount"], transaction["description"])
+            transactionsList.append(transactionObject)
+
+    return transactionsList

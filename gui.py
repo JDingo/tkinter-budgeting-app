@@ -70,6 +70,11 @@ class GUI():
         eventWindow.wait_window(eventWindow)
         print("Poistotapahtuma suoritettu!")
 
+    def importTranscations(self):
+        self.transactionList = transaction.importTransactions(self.transactionList)
+        print("lol")
+        self.printTransactions(self.recent)
+
     def __init__(self, root):
         self.root = root
         root.title("Budjetoija")
@@ -133,7 +138,7 @@ class GUI():
         self.addTransactionButton = Button(self.panel, text="Lisää transaktio", command=lambda: self.updateTransactions('lisaa', self.totalIncome, self.totalExpenses))
         self.removeTransactionButton = Button(self.panel, text="Poista transaktio", command=lambda : self.removeTransactions())
 
-        self.importButton = Button(self.panel, text="Tuo tiedosto", command="")
+        self.importButton = Button(self.panel, text="Tuo tiedosto", command=lambda: self.importTranscations())
         self.exportButton = Button(self.panel, text="Vie tiedosto", command=lambda: transaction.exportTransactions(self.transactionList))
 
         self.exitButton = Button(self.panel, text="Poistu", command=self.exit)
