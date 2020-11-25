@@ -134,7 +134,7 @@ class GUI():
         self.removeTransactionButton = Button(self.panel, text="Poista transaktio", command=lambda : self.removeTransactions())
 
         self.importButton = Button(self.panel, text="Tuo tiedosto", command="")
-        self.exportButton = Button(self.panel, text="Vie tiedosto", command="")
+        self.exportButton = Button(self.panel, text="Vie tiedosto", command=lambda: transaction.exportTransactions(self.transactionList))
 
         self.exitButton = Button(self.panel, text="Poistu", command=self.exit)
 

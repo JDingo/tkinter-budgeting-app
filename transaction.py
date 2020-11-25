@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import simpledialog
 import datetime as dt
+import json
 
 class Transaction:
 
@@ -84,6 +85,7 @@ def removeTransactionEventWindow(root, systemObject):
 
     return window
 
+# Täytä ikkuna maksutapahtumilla poistoa varten
 def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
     print(systemObject.transactionList)
 
@@ -109,7 +111,7 @@ def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
         recentItem.grid(column=2, row=i)
 
     for i, transaction in enumerate(expensesList):
-        dateText = transaction.date.strftime("%d/%m/%Y")
+        dateText = transaction.date.strftime("%d.%m.%Y")
         recentItem = ttk.Label(expensesFrame, text=dateText)
         recentItem.grid(column=0, row=i)
 
@@ -119,3 +121,13 @@ def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
 
         recentItem = ttk.Label(expensesFrame, text=transaction.description)
         recentItem.grid(column=2, row=i)
+
+def exportTransactions(transactionsList):
+    objectList = []
+    with open("transactionData.json","w") as tiedosto:
+        for i in transactionsList:
+            stringDate = i.date.strftime("%d.%m.%Y")
+            data = {"date": stringDate, "amount": i.amount, "sign": i.sign, "description": i.description}
+            objectList.append(data)
+
+        json.dump(objectList, tiedosto)
