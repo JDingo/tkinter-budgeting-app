@@ -64,11 +64,19 @@ def removeTransactionEventWindow(root):
 
     incomeFrame = ttk.Frame(window, borderwidth=2, relief="sunken", width=50, height=200)
     expensesFrame = ttk.Frame(window, borderwidth=2, relief="sunken", width=50, height=200)
+    incomeFrame.grid(column=1, row=1, sticky="nsew")
+    expensesFrame.grid(column=2, row=1, sticky="nsew")
 
-    incomeFrame.grid(column=1, row=1)
-    expensesFrame.grid(column=2, row=1)
+    incomeLabel = ttk.Label(window, text="Tulot")
+    expensesLabel = ttk.Label(window, text="Menot")
+    incomeLabel.grid(column=1, row=0)
+    expensesLabel.grid(column=2, row=0)
+
+    window.columnconfigure(1, weight=1)
+    window.columnconfigure(2, weight=1)
+    window.rowconfigure(1, weight=1)
 
     exitButton = Button(window, text="Poistu", command = window.destroy)
-    exitButton.grid(column=0, row=1)
+    exitButton.grid(column=0, row=1, sticky="nw")
 
     return window
