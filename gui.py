@@ -38,8 +38,19 @@ class GUI():
     def printTransactions(self, masterWindow):
 
         # Siivoa annettu raami uudelleenpiirtoa varten
-        for item in masterWindow.winfo_children():
-            item.destroy()
+        for widget in masterWindow.winfo_children():
+            widget.destroy()
+
+        # Aseta otsikot
+        self.recentLabel = ttk.Label(self.recent, text="Viimeaikainen toiminta")
+        self.recentLabel.grid(column=0, row=0, columnspan=3)
+
+        self.dateLabel = ttk.Label(self.recent, text="Päivämäärä")
+        self.dateLabel.grid(column=0, row=1)
+        self.amountLabel = ttk.Label(self.recent, text="Määrä")
+        self.amountLabel.grid(column=1, row=1)
+        self.descriptionLabel = ttk.Label(self.recent, text="Kuvaus")
+        self.descriptionLabel.grid(column=2, row=1)
 
         self.totalIncome = 0
         self.totalExpenses = 0
@@ -59,16 +70,16 @@ class GUI():
             # Päivitä yleiskatsaus paneeli
             if self.transactionList[i].amount >= 0:
                 self.totalIncome += self.transactionList[i].amount
-                self.guiIncome.set(self.totalIncome)
 
             elif self.transactionList[i].amount < 0:
                 self.totalExpenses += self.transactionList[i].amount
-                self.guiExpenses.set(self.totalExpenses)
 
             else:
                 pass
-
-            self.balance.set(self.totalIncome + self.totalExpenses)
+        
+        self.guiIncome.set(self.totalIncome)
+        self.guiExpenses.set(self.totalExpenses)
+        self.balance.set(self.totalIncome + self.totalExpenses)
 
     def removeTransactions(self):
         eventWindow = transaction.removeTransactionEventWindow(self.root, self)

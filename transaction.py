@@ -27,7 +27,8 @@ class RemoveButton:
         self.index = i
 
     def removeTransaction(self, transactionList):
-        del transactionList[self.index]
+        self.removeButton.configure(bg = "blue")
+        transactionList[self.index] = False
 
 # Luo transaction-objekti (maksutapahtuma) ja lisää se transactionList-listaan (maksutapahtumien lista)
 def createTransaction(date, amount, description, transactionList, eventWindow):
@@ -86,9 +87,6 @@ def removeTransactionEventWindow(root, systemObject):
     window.columnconfigure(2, weight=1)
     window.rowconfigure(1, weight=1)
 
-    exitButton = Button(window, text="Poistu", command = window.destroy)
-    exitButton.grid(column=0, row=1, sticky="nw")
-
     populateRemoveWindow(window, systemObject, incomeFrame, expensesFrame)
 
     return window
@@ -97,41 +95,28 @@ def removeTransactionEventWindow(root, systemObject):
 def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
     print(systemObject.transactionList)
 
+    changedList = systemObject.transactionList.copy()
+
     incomeListIndex = 1
     expensesListIndex = 1
     for transactionIndex, transaction in enumerate(systemObject.transactionList):
         if transaction.sign == "TULO":
-            removeTransactionButton = RemoveButton(incomeFrame, transactionIndex, systemObject.transactionList)
+            removeTransactionButton = RemoveButton(incomeFrame, transactionIndex, changedList)
             printTransactionsToWindow(incomeFrame, transaction, incomeListIndex, removeTransactionButton)
             incomeListIndex +=1
         else:
-            removeTransactionButton = RemoveButton(expensesFrame, transactionIndex, systemObject.transactionList)
+            removeTransactionButton = RemoveButton(expensesFrame, transactionIndex, changedList)
             printTransactionsToWindow(expensesFrame, transaction, expensesListIndex, removeTransactionButton)
             expensesListIndex +=1
 
-    # for i, transaction in enumerate(incomeList):
-    #     dateText = transaction.date.strftime("%d/%m/%Y")
-    #     recentItem = ttk.Label(incomeFrame, text=dateText)
-    #     recentItem.grid(column=0, row=i)
+    saveButton = Button(root, text="Tallenna muutokset", command = lambda : returnRemovedTransactionList(root, changedList, systemObject))
+    saveButton.grid(column=0, row=1, sticky="nw")
 
-    #     amountText = transaction.amount, "€"
-    #     recentItem = ttk.Label(incomeFrame, text=amountText)
-    #     recentItem.grid(column=1, row=i)
-
-    #     recentItem = ttk.Label(incomeFrame, text=transaction.description)
-    #     recentItem.grid(column=2, row=i)
-
-    # for i, transaction in enumerate(expensesList):
-    #     dateText = transaction.date.strftime("%d.%m.%Y")
-    #     recentItem = ttk.Label(expensesFrame, text=dateText)
-    #     recentItem.grid(column=0, row=i)
-
-    #     amountText = transaction.amount, "€"
-    #     recentItem = ttk.Label(expensesFrame, text=amountText)
-    #     recentItem.grid(column=1, row=i)
-
-    #     recentItem = ttk.Label(expensesFrame, text=transaction.description)
-    #     recentItem.grid(column=2, row=i)
+def returnRemovedTransactionList(root, changedList, systemObject):
+    parsedList = list(filter(None, changedList))
+    print(parsedList)
+    systemObject.transactionList = parsedList
+    root.destroy()
 
 def printTransactionsToWindow(masterWindow, transaction, listIndex, removeButton):
     dateText = transaction.date.strftime("%d/%m/%Y")
