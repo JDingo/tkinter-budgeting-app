@@ -21,6 +21,14 @@ class Transaction:
             self.sign = "MENO"
         self.description = description
 
+class RemoveButton:
+    def __init__(self, masterWindow, i, transactionList):
+        self.removeButton = Button(masterWindow, text="X", command = lambda : self.removeTransaction(transactionList))
+        self.index = i
+
+    def removeTransaction(self, transactionList):
+        del transactionList[self.index]
+
 # Luo transaction-objekti (maksutapahtuma) ja lisää se transactionList-listaan (maksutapahtumien lista)
 def createTransaction(date, amount, description, transactionList, eventWindow):
     transactionObject = Transaction(date, int(amount), description)
@@ -89,39 +97,58 @@ def removeTransactionEventWindow(root, systemObject):
 def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
     print(systemObject.transactionList)
 
-    incomeList = []
-    expensesList = []
-
-    for transaction in systemObject.transactionList:
+    incomeListIndex = 1
+    expensesListIndex = 1
+    for transactionIndex, transaction in enumerate(systemObject.transactionList):
         if transaction.sign == "TULO":
-            incomeList.append(transaction)
+            removeTransactionButton = RemoveButton(incomeFrame, transactionIndex, systemObject.transactionList)
+            printTransactionsToWindow(incomeFrame, transaction, incomeListIndex, removeTransactionButton)
+            incomeListIndex +=1
         else:
-            expensesList.append(transaction)
+            removeTransactionButton = RemoveButton(expensesFrame, transactionIndex, systemObject.transactionList)
+            printTransactionsToWindow(expensesFrame, transaction, expensesListIndex, removeTransactionButton)
+            expensesListIndex +=1
 
-    for i, transaction in enumerate(incomeList):
-        dateText = transaction.date.strftime("%d/%m/%Y")
-        recentItem = ttk.Label(incomeFrame, text=dateText)
-        recentItem.grid(column=0, row=i)
+    # for i, transaction in enumerate(incomeList):
+    #     dateText = transaction.date.strftime("%d/%m/%Y")
+    #     recentItem = ttk.Label(incomeFrame, text=dateText)
+    #     recentItem.grid(column=0, row=i)
 
-        amountText = transaction.amount, "€"
-        recentItem = ttk.Label(incomeFrame, text=amountText)
-        recentItem.grid(column=1, row=i)
+    #     amountText = transaction.amount, "€"
+    #     recentItem = ttk.Label(incomeFrame, text=amountText)
+    #     recentItem.grid(column=1, row=i)
 
-        recentItem = ttk.Label(incomeFrame, text=transaction.description)
-        recentItem.grid(column=2, row=i)
+    #     recentItem = ttk.Label(incomeFrame, text=transaction.description)
+    #     recentItem.grid(column=2, row=i)
 
-    for i, transaction in enumerate(expensesList):
-        dateText = transaction.date.strftime("%d.%m.%Y")
-        recentItem = ttk.Label(expensesFrame, text=dateText)
-        recentItem.grid(column=0, row=i)
+    # for i, transaction in enumerate(expensesList):
+    #     dateText = transaction.date.strftime("%d.%m.%Y")
+    #     recentItem = ttk.Label(expensesFrame, text=dateText)
+    #     recentItem.grid(column=0, row=i)
 
-        amountText = transaction.amount, "€"
-        recentItem = ttk.Label(expensesFrame, text=amountText)
-        recentItem.grid(column=1, row=i)
+    #     amountText = transaction.amount, "€"
+    #     recentItem = ttk.Label(expensesFrame, text=amountText)
+    #     recentItem.grid(column=1, row=i)
 
-        recentItem = ttk.Label(expensesFrame, text=transaction.description)
-        recentItem.grid(column=2, row=i)
+    #     recentItem = ttk.Label(expensesFrame, text=transaction.description)
+    #     recentItem.grid(column=2, row=i)
 
+def printTransactionsToWindow(masterWindow, transaction, listIndex, removeButton):
+    dateText = transaction.date.strftime("%d/%m/%Y")
+    recentItem = ttk.Label(masterWindow, text=dateText)
+    recentItem.grid(column=0, row=listIndex)
+
+    amountText = transaction.amount, "€"
+    recentItem = ttk.Label(masterWindow, text=amountText)
+    recentItem.grid(column=1, row=listIndex)
+
+    recentItem = ttk.Label(masterWindow, text=transaction.description)
+    recentItem.grid(column=2, row=listIndex)
+
+    removeButton.removeButton.grid(column=3, row=listIndex)
+        
+
+# Ohjelman tietojen vienti json-tiedostoksi
 def exportTransactions(transactionsList, userName, userAge):
     exportDict = {"name": userName.get(), "age": userAge.get(), "transactions": []}
     with open("transactionData.json","w") as transactionFile:
@@ -132,6 +159,7 @@ def exportTransactions(transactionsList, userName, userAge):
 
         json.dump(exportDict, transactionFile)
 
+# json-tiedoston tuonti ohjelman tietoihin
 def importTransactions(transactionsList, userName, userAge):
     transactionsList = []
     with open("transactionData.json","r") as transactionFile:

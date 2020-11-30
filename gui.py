@@ -36,6 +36,11 @@ class GUI():
 
     # Tulosta maksutapahtumat syötetylle ikkunalle masterWindow
     def printTransactions(self, masterWindow):
+
+        # Siivoa annettu raami uudelleenpiirtoa varten
+        for item in masterWindow.winfo_children():
+            item.destroy()
+
         self.totalIncome = 0
         self.totalExpenses = 0
         for i in range(len(self.transactionList)):
@@ -69,6 +74,7 @@ class GUI():
         eventWindow = transaction.removeTransactionEventWindow(self.root, self)
         eventWindow.wait_window(eventWindow)
         print("Poistotapahtuma suoritettu!")
+        self.printTransactions(self.recent)
 
     def importTranscations(self):
         self.transactionList = transaction.importTransactions(self.transactionList, self.userName, self.userAge)
