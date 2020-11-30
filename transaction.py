@@ -122,22 +122,24 @@ def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
         recentItem = ttk.Label(expensesFrame, text=transaction.description)
         recentItem.grid(column=2, row=i)
 
-def exportTransactions(transactionsList):
-    objectList = []
+def exportTransactions(transactionsList, userName, userAge):
+    exportDict = {"name": userName.get(), "age": userAge.get(), "transactions": []}
     with open("transactionData.json","w") as transactionFile:
         for i in transactionsList:
             stringDate = i.date.strftime("%d.%m.%Y")
             data = {"date": stringDate, "amount": i.amount, "sign": i.sign, "description": i.description}
-            objectList.append(data)
+            exportDict["transactions"].append(data)
 
-        json.dump(objectList, transactionFile)
+        json.dump(exportDict, transactionFile)
 
-def importTransactions(transactionsList):
+def importTransactions(transactionsList, userName, userAge):
     transactionsList = []
     with open("transactionData.json","r") as transactionFile:
-        fileList = json.load(transactionFile)
-        print(fileList)
-        for transaction in fileList:
+        jsonFile = json.load(transactionFile)
+        print(jsonFile)
+        userName.set(jsonFile["name"])
+        userAge.set(jsonFile["age"])
+        for transaction in jsonFile["transactions"]:
             transactionObject = Transaction(transaction["date"], transaction["amount"], transaction["description"])
             transactionsList.append(transactionObject)
 

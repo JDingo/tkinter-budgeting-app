@@ -71,7 +71,7 @@ class GUI():
         print("Poistotapahtuma suoritettu!")
 
     def importTranscations(self):
-        self.transactionList = transaction.importTransactions(self.transactionList)
+        self.transactionList = transaction.importTransactions(self.transactionList, self.userName, self.userAge)
         print("lol")
         self.printTransactions(self.recent)
 
@@ -139,7 +139,7 @@ class GUI():
         self.removeTransactionButton = Button(self.panel, text="Poista transaktio", command=lambda : self.removeTransactions())
 
         self.importButton = Button(self.panel, text="Tuo tiedosto", command=lambda: self.importTranscations())
-        self.exportButton = Button(self.panel, text="Vie tiedosto", command=lambda: transaction.exportTransactions(self.transactionList))
+        self.exportButton = Button(self.panel, text="Vie tiedosto", command=lambda: transaction.exportTransactions(self.transactionList, self.userName, self.userAge))
 
         self.exitButton = Button(self.panel, text="Poistu", command=self.exit)
 
