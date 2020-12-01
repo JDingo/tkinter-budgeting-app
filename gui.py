@@ -2,6 +2,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+import operator as operator
 
 # Tuo profile-tiedosto, joka sisältää käyttäjän tietoja
 import profile as profile
@@ -32,7 +33,12 @@ class GUI():
             eventWindow = transaction.addTransactionEventWindow(self.root, self.transactionList)
             eventWindow.wait_window(eventWindow)
             print("Tapahtuma lisätty!")
+            self.sortTransactions()
             self.printTransactions(self.recent)
+
+    # Järjestä maksutapahtumat aikajärjestykseen uusimmasta vanhimpaan tulostusta varten
+    def sortTransactions(self):
+        self.transactionList.sort(key=operator.attrgetter("date"), reverse=True)
 
     # Tulosta maksutapahtumat syötetylle ikkunalle masterWindow
     def printTransactions(self, masterWindow):
@@ -85,11 +91,12 @@ class GUI():
         eventWindow = transaction.removeTransactionEventWindow(self.root, self)
         eventWindow.wait_window(eventWindow)
         print("Poistotapahtuma suoritettu!")
+        self.sortTransactions()
         self.printTransactions(self.recent)
 
     def importTranscations(self):
         self.transactionList = transaction.importTransactions(self.transactionList, self.userName, self.userAge)
-        print("lol")
+        self.sortTransactions()
         self.printTransactions(self.recent)
 
     def __init__(self, root):
@@ -160,7 +167,7 @@ class GUI():
 
         self.exitButton = Button(self.panel, text="Poistu", command=self.exit)
 
-        self.testButton = Button(self.panel, text="Testi", command=lambda : print(self.transactionList))
+        self.testButton = Button(self.panel, text="Testi", command=lambda : self.sortTransactions())
 
         self.addTransactionButton.grid(column=0, row=1)
         self.removeTransactionButton.grid(column=0, row=2)
