@@ -6,8 +6,10 @@ from tkinter import simpledialog
 import datetime as dt
 import json
 
+# Transaction-luokka mallintaa maksutapahtumia
 class Transaction:
 
+    # Luokan attribuutteja on päivämäärä, euromääräinen arvo, kuvaus maksutapahtumasta ja tapahtuman arvon laatu
     def __init__(self, date, amount, description):
         separatedDate = date.split(".")
         print(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
@@ -15,20 +17,27 @@ class Transaction:
         dateObject = dt.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
         self.date = dateObject
         self.amount = amount
+
+        # Asetetaan maksutapahtumalle arvon laatua vastaava merkitys
         if amount >= 0:
             self.sign = "TULO"
         else:
             self.sign = "MENO"
         self.description = description
 
+# RemoveButton-luokka mallintaa nappia, joka pitää sisällään myös indeksin
+# Indeksin avulla nappi on sidottu maksutapahtumalistan maksutapahtumaan, joka voidaan tarvittaessa poistaa indeksin avulla
 class RemoveButton:
     def __init__(self, masterWindow, i, transactionList):
         self.removeButton = Button(masterWindow, text="X", command = lambda : self.removeTransaction(transactionList))
         self.index = i
 
+    # Maksutapahtuman poistossa asetetaan False indeksin kohdalle
     def removeTransaction(self, transactionList):
         self.removeButton.configure(bg = "blue")
         transactionList[self.index] = False
+
+# --- Maksutapahtuman lisäystoiminta --- #
 
 # Luo transaction-objekti (maksutapahtuma) ja lisää se transactionList-listaan (maksutapahtumien lista)
 def createTransaction(date, amount, description, transactionList, eventWindow):
@@ -68,6 +77,8 @@ def addTransactionEventWindow(root, transactionList):
 
     return window
 
+# --- Maksutapahtumien poistotoiminta --- #
+
 # Luo ikkuna maksutapahtumien poistoa varten
 def removeTransactionEventWindow(root, systemObject):
     window = Toplevel(root)
@@ -93,7 +104,7 @@ def removeTransactionEventWindow(root, systemObject):
 
 # Täytä ikkuna maksutapahtumilla poistoa varten
 def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
-    print(systemObject.transactionList)
+    systemObject.sortTransactions()
 
     changedList = systemObject.transactionList.copy()
 
@@ -112,12 +123,15 @@ def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
     saveButton = Button(root, text="Tallenna muutokset", command = lambda : returnRemovedTransactionList(root, changedList, systemObject))
     saveButton.grid(column=0, row=1, sticky="nw")
 
+# Poistotapahtuman tallennus päälistaan
 def returnRemovedTransactionList(root, changedList, systemObject):
+    # Karsi kaikki False-arvot eli poistetut maksutapahtumat listasta
     parsedList = list(filter(None, changedList))
-    print(parsedList)
+    # Tallenna karsittu lista päälistaksi
     systemObject.transactionList = parsedList
     root.destroy()
 
+# Tulosta poistotapahtumaikkunalle maksutapahtumat sekä niitä vastaava poistonappi
 def printTransactionsToWindow(masterWindow, transaction, listIndex, removeButton):
     dateText = transaction.date.strftime("%d/%m/%Y")
     recentItem = ttk.Label(masterWindow, text=dateText)
@@ -132,6 +146,8 @@ def printTransactionsToWindow(masterWindow, transaction, listIndex, removeButton
 
     removeButton.removeButton.grid(column=3, row=listIndex)
         
+
+# --- Ohjelman tallennus tiedostoon ja tuonti tiedostosta --- #
 
 # Ohjelman tietojen vienti json-tiedostoksi
 def exportTransactions(transactionsList, userName, userAge):

@@ -1,12 +1,13 @@
 import tkinter as tk
 
+# Aseta annetut parametrit StringVar-tyypin muuttujiin
+# StringVar päivittää tiedot automaattisesti
 def editInfo(name, age, userName, userAge, window):
     userName.set(name)
     userAge.set(age)
-    print("ok")
     window.destroy()
 
-
+# Käyttäjätietojen muutosikkuna
 def editInfoEventWindow(root, userName, userAge):
     window = tk.Toplevel(root)
     window.title("Muokkaa tietoja")
