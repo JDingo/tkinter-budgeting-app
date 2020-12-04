@@ -84,7 +84,7 @@ def addTransaction(root, userObject):
 # --- Maksutapahtumien poistotoiminta --- #
 
 # Luo ikkuna maksutapahtumien poistoa varten
-def removeTransactionEventWindow(root, systemObject):
+def removeTransactionEventWindow(root, userData):
     window = Toplevel(root)
     window.title("Poista maksutapahtumia")
 
@@ -102,19 +102,17 @@ def removeTransactionEventWindow(root, systemObject):
     window.columnconfigure(2, weight=1)
     window.rowconfigure(1, weight=1)
 
-    populateRemoveWindow(window, systemObject, incomeFrame, expensesFrame)
+    populateRemoveWindow(window, userData, incomeFrame, expensesFrame)
 
     return window
 
 # Täytä ikkuna maksutapahtumilla poistoa varten
-def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
-    systemObject.sortTransactions()
-
-    changedList = systemObject.transactionList.copy()
+def populateRemoveWindow(root, userData, incomeFrame, expensesFrame):
+    changedList = userData.transactionList.copy()
 
     incomeListIndex = 1
     expensesListIndex = 1
-    for transactionIndex, transaction in enumerate(systemObject.transactionList):
+    for transactionIndex, transaction in enumerate(userData.transactionList):
         if transaction.sign == "TULO":
             removeTransactionButton = RemoveButton(incomeFrame, transactionIndex, changedList)
             printTransactionsToWindow(incomeFrame, transaction, incomeListIndex, removeTransactionButton)
@@ -124,15 +122,15 @@ def populateRemoveWindow(root, systemObject, incomeFrame, expensesFrame):
             printTransactionsToWindow(expensesFrame, transaction, expensesListIndex, removeTransactionButton)
             expensesListIndex +=1
 
-    saveButton = Button(root, text="Tallenna muutokset", command = lambda : returnRemovedTransactionList(root, changedList, systemObject))
+    saveButton = Button(root, text="Tallenna muutokset", command = lambda : returnRemovedTransactionList(root, changedList, userData))
     saveButton.grid(column=0, row=1, sticky="nw")
 
 # Poistotapahtuman tallennus päälistaan
-def returnRemovedTransactionList(root, changedList, systemObject):
+def returnRemovedTransactionList(root, changedList, userData):
     # Karsi kaikki False-arvot eli poistetut maksutapahtumat listasta
     parsedList = list(filter(None, changedList))
     # Tallenna karsittu lista päälistaksi
-    systemObject.transactionList = parsedList
+    userData.transactionList = parsedList
     root.destroy()
 
 # Tulosta poistotapahtumaikkunalle maksutapahtumat sekä niitä vastaava poistonappi
@@ -154,10 +152,10 @@ def printTransactionsToWindow(masterWindow, transaction, listIndex, removeButton
 # --- Ohjelman tallennus tiedostoon ja tuonti tiedostosta --- #
 
 # Ohjelman tietojen vienti json-tiedostoksi
-def exportTransactions(transactionsList, userName, userAge):
-    exportDict = {"name": userName.get(), "age": userAge.get(), "transactions": []}
+def exportTransactions(userData):
+    exportDict = {"name": userData.userName.get(), "age": userData.userAge.get(), "transactions": []}
     with open("transactionData.json","w") as transactionFile:
-        for i in transactionsList:
+        for i in userData.transactionsList:
             stringDate = i.date.strftime("%d.%m.%Y")
             data = {"date": stringDate, "amount": i.amount, "sign": i.sign, "description": i.description}
             exportDict["transactions"].append(data)
@@ -165,13 +163,13 @@ def exportTransactions(transactionsList, userName, userAge):
         json.dump(exportDict, transactionFile)
 
 # json-tiedoston tuonti ohjelman tietoihin
-def importTransactions(transactionsList, userName, userAge):
+def importTransactions(userData):
     transactionsList = []
     with open("transactionData.json","r") as transactionFile:
         jsonFile = json.load(transactionFile)
         print(jsonFile)
-        userName.set(jsonFile["name"])
-        userAge.set(jsonFile["age"])
+        userData.userName.set(jsonFile["name"])
+        userData.userAge.set(jsonFile["age"])
         for transaction in jsonFile["transactions"]:
             transactionObject = Transaction(transaction["date"], transaction["amount"], transaction["description"])
             transactionsList.append(transactionObject)

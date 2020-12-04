@@ -23,18 +23,18 @@ class GUI:
 
     # Päivitä maksutapahtumat käymällä lista läpi
     # Päivitä käyttöliittymästä overview- ja recent-paneelit
-    def addTransaction(self, userObject):
-        transaction.addTransaction(self.root, userObject)
-        print(userObject.transactionList)
-        self.sortTransactions(userObject)
-        self.printTransactions(userObject, self.recent)
+    def addTransaction(self):
+        transaction.addTransaction(self.root, self.userData)
+        print(self.userData)
+        self.sortTransactions()
+        self.printTransactions(self.recent)
 
     # Järjestä maksutapahtumat aikajärjestykseen uusimmasta vanhimpaan tulostusta varten
-    def sortTransactions(self, userObject):
-        userObject.transactionList.sort(key=operator.attrgetter("date"), reverse=True)
+    def sortTransactions(self):
+        self.userData.transactionList.sort(key=operator.attrgetter("date"), reverse=True)
 
     # Tulosta maksutapahtumat syötetylle ikkunalle masterWindow
-    def printTransactions(self, userObject, masterWindow):
+    def printTransactions(self, masterWindow):
 
         # Siivoa annettu raami uudelleenpiirtoa varten
         for widget in masterWindow.winfo_children():
@@ -53,7 +53,7 @@ class GUI:
 
         totalIncome = 0
         totalExpenses = 0
-        for rowIndex, transaction in enumerate(userObject.transactionList):
+        for rowIndex, transaction in enumerate(self.userData.transactionList):
             # Päivitä recent-paneeli
             print(transaction.date)
             dateText = transaction.date.strftime("%d/%m/%Y")
@@ -77,25 +77,26 @@ class GUI:
             else:
                 pass
         
-        userObject.guiIncome.set(totalIncome)
-        userObject.guiExpenses.set(totalExpenses)
-        userObject.balance.set(totalIncome + totalExpenses)
+        self.userData.guiIncome.set(totalIncome)
+        self.userData.guiExpenses.set(totalExpenses)
+        self.userData.balance.set(totalIncome + totalExpenses)
 
     def removeTransactions(self):
-        eventWindow = transaction.removeTransactionEventWindow(self.root, self)
+        eventWindow = transaction.removeTransactionEventWindow(self.root, self.userData)
         eventWindow.wait_window(eventWindow)
         print("Poistotapahtuma suoritettu!")
         self.sortTransactions()
         self.printTransactions(self.recent)
 
     def importTranscations(self):
-        self.transactionList = transaction.importTransactions(self.transactionList, self.userName, self.userAge)
+        self.userData.transactionList = transaction.importTransactions(self.userData)
         self.sortTransactions()
         self.printTransactions(self.recent)
 
     def __init__(self, userObject):
         self.root = root
         root.title("Budjetoija")
+        self.userData = userObject
 
         # Pääraamit ohjelmalle
         self.mainframe = ttk.Frame(self.root, borderwidth=10, relief="raised", padding=(3,3,12,12), width=10, height=10)
@@ -134,11 +135,11 @@ class GUI:
         self.panelLabel = ttk.Label(self.panel, text="Hallintapaneeli")
         self.panelLabel.grid(column=0, row=0)
 
-        self.addTransactionButton = Button(self.panel, text="Lisää transaktio", command=lambda: self.addTransaction(userObject))
+        self.addTransactionButton = Button(self.panel, text="Lisää transaktio", command=lambda: self.addTransaction())
         self.removeTransactionButton = Button(self.panel, text="Poista transaktio", command=lambda : self.removeTransactions())
 
         self.importButton = Button(self.panel, text="Tuo tiedosto", command=lambda: self.importTranscations())
-        self.exportButton = Button(self.panel, text="Vie tiedosto", command=lambda: transaction.exportTransactions(userObject.transactionList, userObject.userName, userObject.userAge))
+        self.exportButton = Button(self.panel, text="Vie tiedosto", command=lambda: transaction.exportTransactions(self.userData))
 
         self.exitButton = Button(self.panel, text="Poistu", command=self.exit)
 
