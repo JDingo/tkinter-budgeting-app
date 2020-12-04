@@ -28,14 +28,23 @@ class Transaction:
 # RemoveButton-luokka mallintaa nappia, joka pitää sisällään myös indeksin
 # Indeksin avulla nappi on sidottu maksutapahtumalistan maksutapahtumaan, joka voidaan tarvittaessa poistaa indeksin avulla
 class RemoveButton:
-    def __init__(self, masterWindow, i, transactionList):
-        self.removeButton = Button(masterWindow, text="X", command = lambda : self.removeTransaction(transactionList))
+    def __init__(self, masterWindow, i, toRemoveList):
+        self.removeButton = Button(masterWindow, text="X", command = lambda : self.removeTransaction(toRemoveList))
         self.index = i
+        self.state = False
 
     # Maksutapahtuman poistossa asetetaan False indeksin kohdalle
     def removeTransaction(self, transactionList):
-        self.removeButton.configure(bg = "blue")
-        transactionList[self.index] = False
+        if self.state == False:
+            self.removeButton.configure(bg = "red")
+            transactionList[self.index] = True
+            self.state = not self.state
+        elif self.state == True:
+            self.removeButton.configure(bg = "SystemButtonFace")
+            transactionList[self.index] = False
+            self.state = not self.state
+        else:
+            print("Remove error")
 
 # --- Maksutapahtuman lisäystoiminta --- #
 
@@ -109,24 +118,29 @@ def removeTransactionEventWindow(root, userData):
 # Täytä ikkuna maksutapahtumilla poistoa varten
 def populateRemoveWindow(root, userData, incomeFrame, expensesFrame):
     changedList = userData.transactionList.copy()
+    toRemoveList = [False for i in range(len(changedList))]
 
     incomeListIndex = 1
     expensesListIndex = 1
     for transactionIndex, transaction in enumerate(userData.transactionList):
         if transaction.sign == "TULO":
-            removeTransactionButton = RemoveButton(incomeFrame, transactionIndex, changedList)
+            removeTransactionButton = RemoveButton(incomeFrame, transactionIndex, toRemoveList)
             printTransactionsToWindow(incomeFrame, transaction, incomeListIndex, removeTransactionButton)
             incomeListIndex +=1
         else:
-            removeTransactionButton = RemoveButton(expensesFrame, transactionIndex, changedList)
+            removeTransactionButton = RemoveButton(expensesFrame, transactionIndex, toRemoveList)
             printTransactionsToWindow(expensesFrame, transaction, expensesListIndex, removeTransactionButton)
             expensesListIndex +=1
 
-    saveButton = Button(root, text="Tallenna muutokset", command = lambda : returnRemovedTransactionList(root, changedList, userData))
+    saveButton = Button(root, text="Tallenna muutokset", command = lambda : returnRemovedTransactionList(root, changedList, toRemoveList, userData))
     saveButton.grid(column=0, row=1, sticky="nw")
 
 # Poistotapahtuman tallennus päälistaan
-def returnRemovedTransactionList(root, changedList, userData):
+def returnRemovedTransactionList(root, changedList, toRemoveList, userData):
+    for index, state in enumerate(toRemoveList):
+        if state == True:
+            changedList[index] = False
+    
     # Karsi kaikki False-arvot eli poistetut maksutapahtumat listasta
     parsedList = list(filter(None, changedList))
     # Tallenna karsittu lista päälistaksi
