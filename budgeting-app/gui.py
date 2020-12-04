@@ -23,17 +23,15 @@ class GUI:
 
     # Päivitä maksutapahtumat käymällä lista läpi
     # Päivitä käyttöliittymästä overview- ja recent-paneelit
-    def updateTransactions(self, userObject, action, totalIncome, totalExpenses):
-        if action == 'lisaa':
-            eventWindow = transaction.addTransactionEventWindow(self.root, self.transactionList)
-            eventWindow.wait_window(eventWindow)
-            print("Tapahtuma lisätty!")
-            self.sortTransactions()
-            self.printTransactions(self.recent, userObject)
+    def addTransaction(self, userObject):
+        transaction.addTransaction(self.root, userObject)
+        print(userObject.transactionList)
+        self.sortTransactions(userObject)
+        self.printTransactions(userObject, self.recent)
 
     # Järjestä maksutapahtumat aikajärjestykseen uusimmasta vanhimpaan tulostusta varten
-    def sortTransactions(self):
-        self.transactionList.sort(key=operator.attrgetter("date"), reverse=True)
+    def sortTransactions(self, userObject):
+        userObject.transactionList.sort(key=operator.attrgetter("date"), reverse=True)
 
     # Tulosta maksutapahtumat syötetylle ikkunalle masterWindow
     def printTransactions(self, userObject, masterWindow):
@@ -53,34 +51,35 @@ class GUI:
         self.descriptionLabel = ttk.Label(self.recent, text="Kuvaus")
         self.descriptionLabel.grid(column=2, row=1)
 
-        self.totalIncome = 0
-        self.totalExpenses = 0
-        for i in range(len(self.transactionList)):
+        totalIncome = 0
+        totalExpenses = 0
+        for rowIndex, transaction in enumerate(userObject.transactionList):
             # Päivitä recent-paneeli
-            dateText = userObject.transactionList[i].date.strftime("%d/%m/%Y")
+            print(transaction.date)
+            dateText = transaction.date.strftime("%d/%m/%Y")
             recentItem = ttk.Label(masterWindow, text=dateText)
-            recentItem.grid(column=0, row=i+2)
+            recentItem.grid(column=0, row=rowIndex+2)
 
-            amountText = userObject.transactionList[i].amount, "€"
+            amountText = transaction.amount, "€"
             recentItem = ttk.Label(masterWindow, text=amountText)
-            recentItem.grid(column=1, row=i+2)
+            recentItem.grid(column=1, row=rowIndex+2)
 
-            recentItem = ttk.Label(masterWindow, text=self.transactionList[i].description)
-            recentItem.grid(column=2, row=i+2)
+            recentItem = ttk.Label(masterWindow, text=transaction.description)
+            recentItem.grid(column=2, row=rowIndex+2)
 
             # Päivitä yleiskatsaus paneeli
-            if userObject.transactionList[i].amount >= 0:
-                userObject.totalIncome += self.transactionList[i].amount
+            if transaction.amount >= 0:
+                totalIncome += transaction.amount
 
-            elif userObject.transactionList[i].amount < 0:
-                userObject.totalExpenses += self.transactionList[i].amount
+            elif transaction.amount < 0:
+                totalExpenses += transaction.amount
 
             else:
                 pass
         
-        userObject.guiIncome.set(self.totalIncome)
-        userObject.guiExpenses.set(self.totalExpenses)
-        userObject.balance.set(self.totalIncome + self.totalExpenses)
+        userObject.guiIncome.set(totalIncome)
+        userObject.guiExpenses.set(totalExpenses)
+        userObject.balance.set(totalIncome + totalExpenses)
 
     def removeTransactions(self):
         eventWindow = transaction.removeTransactionEventWindow(self.root, self)
@@ -135,7 +134,7 @@ class GUI:
         self.panelLabel = ttk.Label(self.panel, text="Hallintapaneeli")
         self.panelLabel.grid(column=0, row=0)
 
-        self.addTransactionButton = Button(self.panel, text="Lisää transaktio", command=lambda: self.updateTransactions(userObject, 'lisaa', userObject.totalIncome, userObject.totalExpenses))
+        self.addTransactionButton = Button(self.panel, text="Lisää transaktio", command=lambda: self.addTransaction(userObject))
         self.removeTransactionButton = Button(self.panel, text="Poista transaktio", command=lambda : self.removeTransactions())
 
         self.importButton = Button(self.panel, text="Tuo tiedosto", command=lambda: self.importTranscations())
