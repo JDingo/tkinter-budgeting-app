@@ -155,7 +155,7 @@ def printTransactionsToWindow(masterWindow, transaction, listIndex, removeButton
 def exportTransactions(userData):
     exportDict = {"name": userData.userName.get(), "age": userData.userAge.get(), "transactions": []}
     with open("transactionData.json","w") as transactionFile:
-        for i in userData.transactionsList:
+        for i in userData.transactionList:
             stringDate = i.date.strftime("%d.%m.%Y")
             data = {"date": stringDate, "amount": i.amount, "sign": i.sign, "description": i.description}
             exportDict["transactions"].append(data)
@@ -167,7 +167,6 @@ def importTransactions(userData):
     transactionsList = []
     with open("transactionData.json","r") as transactionFile:
         jsonFile = json.load(transactionFile)
-        print(jsonFile)
         userData.userName.set(jsonFile["name"])
         userData.userAge.set(jsonFile["age"])
         for transaction in jsonFile["transactions"]:
