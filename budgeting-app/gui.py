@@ -77,9 +77,12 @@ class GUI:
             else:
                 pass
         
-        self.userData.guiIncome.set(totalIncome)
-        self.userData.guiExpenses.set(totalExpenses)
-        self.userData.balance.set(totalIncome + totalExpenses)
+        incomeString = totalIncome, "€"
+        expensesString = totalExpenses, "€"
+        self.userData.guiIncome.set(incomeString)
+        self.userData.guiExpenses.set(expensesString)
+        balanceString = totalIncome + totalExpenses, "€"
+        self.userData.balance.set(balanceString)
 
     def removeTransactions(self):
         eventWindow = transaction.removeTransactionEventWindow(self.root, self.userData)
