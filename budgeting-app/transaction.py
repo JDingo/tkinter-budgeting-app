@@ -44,8 +44,11 @@ class RemoveButton:
 # --- Maksutapahtuman lisäystoiminta --- #
 
 def addTransaction(root, userObject):
-    
-    def addTransactionEventWindow(root, transactionList):
+    eventWindow = addTransactionEventWindow(root, userObject.transactionList)
+    eventWindow.wait_window(eventWindow)
+    print("Tapahtuma lisätty!")
+
+def addTransactionEventWindow(root, transactionList):
         window = tk.Toplevel(root)
         window.title("Lisää maksutapahtuma")
         
@@ -59,7 +62,7 @@ def addTransaction(root, userObject):
         descriptionLabel = tk.Label(window, text="Kuvaus [Vapaaehtoinen]:")
         descriptionEntry = tk.Entry(window)
 
-        addButton = tk.Button(window, text="Lisää transaktio", command = lambda : createTransaction(dateEntry, amountEntry, dateEntry.get(), amountEntry.get(), descriptionEntry.get(), transactionList, window))
+        addButton = tk.Button(window, text="Lisää transaktio", command = lambda : validateUserInput(dateEntry, amountEntry, dateEntry.get(), amountEntry.get(), descriptionEntry.get(), transactionList, window))
         exitButton = tk.Button(window, text="Poistu", command = window.destroy)
 
         dateLabel.grid(row=0, column=0)
@@ -74,40 +77,41 @@ def addTransaction(root, userObject):
 
         return window
 
-    # Luo maksutapahtuma Transaction-oliona
-    def createTransaction(dateEntry, amountEntry, date, amount, description, transactionList, eventWindow):
-        error = False
-        try:
-            amount = round(float(amount), 2)
-            amountEntry.configure(bg="SystemWindow")
-        except ValueError:
-            amountEntry.configure(bg="salmon")
-            eventWindow.bell()
-            error = True
+# Käyttäjän syötteen validointi
+def validateUserInput(dateEntry, amountEntry, date, amount, description, transactionList, window):
+    error = False
+    try:
+        amount = round(float(amount), 2)
+        amountEntry.configure(bg="SystemWindow")
+    except ValueError:
+        amountEntry.configure(bg="salmon")
+        window.bell()
+        error = True
 
-        try:
-            separatedDate = date.split(".")
-            dateObject = dt.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
-            dateEntry.configure(bg="SystemWindow")
-        except IndexError:
-            dateEntry.configure(bg="salmon")
-            eventWindow.bell()
-            error = True
+    try:
+        separatedDate = date.split(".")
+        dateObject = dt.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
+        dateEntry.configure(bg="SystemWindow")
+    except IndexError:
+        dateEntry.configure(bg="salmon")
+        window.bell()
+        error = True
 
-        if error:
-            return None
-        else:
-            pass
+    if error:
+        return None
+    else:
+        createTransaction(dateObject, amount, description, transactionList, window)
 
-        transactionObject = Transaction(dateObject, amount, description)
 
-        transactionList.append(transactionObject)
+# Luo maksutapahtuma Transaction-oliona
+def createTransaction(dateObject, amount, description, transactionList, window):
+    transactionObject = Transaction(dateObject, amount, description)
 
-        eventWindow.destroy()
+    transactionList.append(transactionObject)
 
-    eventWindow = addTransactionEventWindow(root, userObject.transactionList)
-    eventWindow.wait_window(eventWindow)
-    print("Tapahtuma lisätty!")
+    window.destroy()
+
+    return transactionObject
     
 # --- Maksutapahtumien poistotoiminta --- #
 
