@@ -51,6 +51,7 @@ def addTransaction(root, userObject):
         
         dateLabel = tk.Label(window, text="Päivämäärä [dd.mm.yyyy]:")
         dateEntry = tk.Entry(window)
+        dateEntry.insert(0, dt.datetime.now().strftime("%d.%m.%Y"))
 
         amountLabel = tk.Label(window, text="Määrä  [xxx.xx]:")
         amountEntry = tk.Entry(window)
@@ -77,7 +78,7 @@ def addTransaction(root, userObject):
     def createTransaction(dateEntry, amountEntry, date, amount, description, transactionList, eventWindow):
         error = False
         try:
-            amount = float(amount)
+            amount = round(float(amount), 2)
             amountEntry.configure(bg="SystemWindow")
         except ValueError:
             amountEntry.configure(bg="salmon")
@@ -202,7 +203,9 @@ def importTransactions(userData):
         userData.userName.set(jsonFile["name"])
         userData.userAge.set(jsonFile["age"])
         for transaction in jsonFile["transactions"]:
-            transactionObject = Transaction(transaction["date"], transaction["amount"], transaction["description"])
+            separatedDate = transaction["date"].split(".")
+            dateObject = dt.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
+            transactionObject = Transaction(dateObject, transaction["amount"], transaction["description"])
             transactionsList.append(transactionObject)
 
     return transactionsList

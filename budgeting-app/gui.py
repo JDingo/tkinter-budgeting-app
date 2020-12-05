@@ -87,6 +87,7 @@ class GUI:
                 print("Virhe summien laskussa!")
         
         # Aseta uudet arvot StringVar()-muuttujalle
+        print(totalIncome, totalExpenses)
         incomeString = totalIncome, "€"
         expensesString = totalExpenses, "€"
         monthlyIncomeString = monthlyIncome, "€"
@@ -95,8 +96,9 @@ class GUI:
         self.userData.guiExpenses.set(expensesString)
         self.userData.monthlyIncome.set(monthlyIncomeString)
         self.userData.monthlyExpenses.set(monthlyExpensesString)
-        monthlyBalanceString = monthlyIncome + monthlyExpenses, "€"
-        balanceString = totalIncome + totalExpenses, "€"
+
+        monthlyBalanceString = round(monthlyIncome + monthlyExpenses, 2), "€"
+        balanceString = round(totalIncome + totalExpenses, 2), "€"
         self.userData.balance.set(balanceString)
         self.userData.monthlyBalance.set(monthlyBalanceString)
 
