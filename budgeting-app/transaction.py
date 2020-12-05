@@ -9,10 +9,7 @@ import json as json
 class Transaction:
 
     # Luokan attribuutteja on päivämäärä, euromääräinen arvo, kuvaus maksutapahtumasta ja tapahtuman arvon laatu
-    def __init__(self, date, amount, description):
-        separatedDate = date.split(".")
-
-        dateObject = dt.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
+    def __init__(self, dateObject, amount, description):
         self.date = dateObject
         self.amount = amount
 
@@ -55,13 +52,13 @@ def addTransaction(root, userObject):
         dateLabel = tk.Label(window, text="Päivämäärä [dd.mm.yyyy]:")
         dateEntry = tk.Entry(window)
 
-        amountLabel = tk.Label(window, text="Määrä:")
+        amountLabel = tk.Label(window, text="Määrä  [xxx.xx]:")
         amountEntry = tk.Entry(window)
 
-        descriptionLabel = tk.Label(window, text="Kuvaus:")
+        descriptionLabel = tk.Label(window, text="Kuvaus [Vapaaehtoinen]:")
         descriptionEntry = tk.Entry(window)
 
-        addButton = tk.Button(window, text="Lisää transaktio", command = lambda : createTransaction(dateEntry.get(), amountEntry.get(), descriptionEntry.get(), transactionList, window))
+        addButton = tk.Button(window, text="Lisää transaktio", command = lambda : createTransaction(dateEntry, amountEntry, dateEntry.get(), amountEntry.get(), descriptionEntry.get(), transactionList, window))
         exitButton = tk.Button(window, text="Poistu", command = window.destroy)
 
         dateLabel.grid(row=0, column=0)
@@ -76,8 +73,32 @@ def addTransaction(root, userObject):
 
         return window
 
-    def createTransaction(date, amount, description, transactionList, eventWindow):
-        transactionObject = Transaction(date, int(amount), description)
+    # Luo maksutapahtuma Transaction-oliona
+    def createTransaction(dateEntry, amountEntry, date, amount, description, transactionList, eventWindow):
+        error = False
+        try:
+            amount = float(amount)
+            amountEntry.configure(bg="SystemWindow")
+        except ValueError:
+            amountEntry.configure(bg="salmon")
+            eventWindow.bell()
+            error = True
+
+        try:
+            separatedDate = date.split(".")
+            dateObject = dt.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
+            dateEntry.configure(bg="SystemWindow")
+        except IndexError:
+            dateEntry.configure(bg="salmon")
+            eventWindow.bell()
+            error = True
+
+        if error:
+            return None
+        else:
+            pass
+
+        transactionObject = Transaction(dateObject, amount, description)
 
         transactionList.append(transactionObject)
 
@@ -126,7 +147,7 @@ def removeTransactionEventWindow(root, userData):
 
     # Tulosta poistotapahtumaikkunalle maksutapahtumat sekä niitä vastaava poistonappi
     def printTransactionsToWindow(masterWindow, transaction, listIndex, removeButton):
-        dateText = transaction.date.strftime("%d/%m/%Y")
+        dateText = transaction.date.strftime("%d.%m.%Y")
         recentItem = tk.Label(masterWindow, text=dateText)
         recentItem.grid(column=0, row=listIndex)
 
