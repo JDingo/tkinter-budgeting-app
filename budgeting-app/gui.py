@@ -33,6 +33,9 @@ class GUI:
         for widget in masterWindow.winfo_children():
             widget.destroy()
 
+        # Tarkista tämänhetkinen vuosi ja kuukausi
+        currentMonthYear = dt.datetime.now().strftime("%m.%Y")
+
         # Aseta otsikot
         self.recentLabel = tk.Label(self.recent, text="Viimeaikainen toiminta")
         self.recentLabel.grid(column=0, row=0, columnspan=3)
@@ -47,6 +50,8 @@ class GUI:
         # Laske uudet arvot käymällä lista läpi
         totalIncome = 0
         totalExpenses = 0
+        monthlyIncome = 0
+        monthlyExpenses = 0
         for rowIndex, transaction in enumerate(self.userData.transactionList):
             # Tulosta tapahtumat annetulle ikkunalle
             dateText = transaction.date.strftime("%d/%m/%Y")
@@ -60,23 +65,37 @@ class GUI:
             recentItem = tk.Label(masterWindow, text=transaction.description)
             recentItem.grid(column=2, row=rowIndex+2)
 
-            # Laske uudet arvot kokonaistulolle ja -menolle
-            if transaction.amount >= 0:
+            # Laske uudet arvot kokonaistulolle ja -menolle (myös kuukausittaille arvoille)
+            if transaction.amount >= 0 and transaction.date.strftime("%m.%Y") == currentMonthYear:
                 totalIncome += transaction.amount
+                monthlyIncome += transaction.amount
+
+            elif transaction.amount >= 0:
+                totalIncome += transaction.amount
+
+            elif transaction.amount < 0 and transaction.date.strftime("%m.%Y") == currentMonthYear:
+                totalExpenses += transaction.amount
+                monthlyExpenses += transaction.amount
 
             elif transaction.amount < 0:
                 totalExpenses += transaction.amount
 
             else:
-                pass
+                print("Virhe summien laskussa!")
         
         # Aseta uudet arvot StringVar()-muuttujalle
         incomeString = totalIncome, "€"
         expensesString = totalExpenses, "€"
+        monthlyIncomeString = monthlyIncome, "€"
+        monthlyExpensesString = monthlyExpenses, "€"
         self.userData.guiIncome.set(incomeString)
         self.userData.guiExpenses.set(expensesString)
+        self.userData.monthlyIncome.set(monthlyIncomeString)
+        self.userData.monthlyExpenses.set(monthlyExpensesString)
+        monthlyBalanceString = monthlyIncome + monthlyExpenses, "€"
         balanceString = totalIncome + totalExpenses, "€"
         self.userData.balance.set(balanceString)
+        self.userData.monthlyBalance.set(monthlyBalanceString)
 
     # Maksutapahtumien poisto
     def removeTransactions(self):
@@ -98,7 +117,7 @@ class GUI:
         self.userData = userObject
 
         # Pääraamit ohjelmalle
-        self.mainframe = tk.Frame(self.root, borderwidth=10, padding=(3,3,12,12), width=10, height=10)
+        self.mainframe = tk.Frame(self.root, borderwidth=10, width=10, height=10)
 
         # Paneelit eri osille
         self.info = tk.Frame(self.mainframe, borderwidth=2, relief="sunken", width=200, height=50)
@@ -114,7 +133,7 @@ class GUI:
         self.recent.grid(column=2, row=1, rowspan=2, sticky="nsew", pady=(2,2), padx=(2,2))
 
         # Info-paneelin sisältö
-        self.infoLabel = tk.Label(self.info, text="Info")
+        self.infoLabel = tk.Label(self.info, text="Info", font="bold")
         self.infoLabel.grid(column=0, row=0, sticky="nw", pady=(2,2), padx=(2,2))
 
         self.nameLabel = tk.Label(self.info, textvariable=userObject.userName)
@@ -131,7 +150,7 @@ class GUI:
         self.editButton.grid(column=1, row=0)
 
         # Panel-paneelin sisältö
-        self.panelLabel = tk.Label(self.panel, text="Hallintapaneeli")
+        self.panelLabel = tk.Label(self.panel, text="Hallintapaneeli", font="bold")
         self.panelLabel.grid(column=0, row=0, pady=(2,0), padx=(2,2))
 
         self.addTransactionButton = tk.Button(self.panel, text="Lisää transaktio", command=lambda: self.addTransaction())
@@ -155,27 +174,44 @@ class GUI:
         self.testButton.grid(column=0, row=6, pady=(1,5), padx=(5,5))
 
         # Overview-paneelin sisältö
-        self.overviewLabel = tk.Label(self.overview, text="Yleiskatsaus")
+        self.overviewLabel = tk.Label(self.overview, text="Yleiskatsaus", font="bold")
         self.overviewLabel.grid(column=0, row=0, pady=(2,2), padx=(2,2))
 
+        self.monthlyLabel = tk.Label(self.overview, text="Kuukauden budjetti")
+        self.monthlyIncomeLabel = tk.Label(self.overview, text="Tulot:")
+        self.monthlyIncomeContent = tk.Label(self.overview, textvariable=userObject.monthlyIncome)
+        self.monthlyExpensesLabel = tk.Label(self.overview, text="Menot:")
+        self.monthlyExpensesContent = tk.Label(self.overview, textvariable=userObject.monthlyExpenses)
+        self.monthlyBalanceLabel = tk.Label(self.overview, text="Yhteensä:")
+        self.monthlyBalanceContent = tk.Label(self.overview, textvariable=userObject.monthlyBalance)
+
+        self.monthlyLabel.grid(column=0, row=1, sticky="w")
+        self.monthlyIncomeLabel.grid(column=0, row=2)
+        self.monthlyIncomeContent.grid(column=1, row=2)
+        self.monthlyExpensesLabel.grid(column=0, row=3)
+        self.monthlyExpensesContent.grid(column=1, row=3)
+        self.monthlyBalanceLabel.grid(column=0, row=4)
+        self.monthlyBalanceContent.grid(column=1, row=4)
+
+        self.totalLabel = tk.Label(self.overview, text="Koko budjetti")
+        self.monthlyLabel = tk.Label(self.overview, text="Kuukauden budjetti")
         self.incomeLabel = tk.Label(self.overview, text="Tulot:")
         self.incomeContent = tk.Label(self.overview, textvariable=userObject.guiIncome)
-
         self.expensesLabel = tk.Label(self.overview, text="Menot:")
         self.expensesContent = tk.Label(self.overview, textvariable=userObject.guiExpenses)
-
         self.balanceLabel = tk.Label(self.overview, text="Yhteensä:")
         self.balanceContent = tk.Label(self.overview, textvariable=userObject.balance)
 
-        self.incomeLabel.grid(column=0, row=1)
-        self.incomeContent.grid(column=1, row=1)
-        self.expensesLabel.grid(column=0, row=2)
-        self.expensesContent.grid(column=1, row=2)
-        self.balanceLabel.grid(column=0, row=4)
-        self.balanceContent.grid(column=1, row=4)
+        self.totalLabel.grid(column=0, row=5, sticky="w", pady=(2,0))
+        self.incomeLabel.grid(column=0, row=6)
+        self.incomeContent.grid(column=1, row=6)
+        self.expensesLabel.grid(column=0, row=7)
+        self.expensesContent.grid(column=1, row=7)
+        self.balanceLabel.grid(column=0, row=8)
+        self.balanceContent.grid(column=1, row=8)
 
         # Recent-paneelin sisältö
-        self.recentLabel = tk.Label(self.recent, text="Viimeaikainen toiminta")
+        self.recentLabel = tk.Label(self.recent, text="Viimeaikainen toiminta", font="bold")
         self.recentLabel.grid(column=0, row=0, columnspan=3, pady=(2,2), padx=(2,2))
 
         self.dateLabel = tk.Label(self.recent, text="Päivämäärä")

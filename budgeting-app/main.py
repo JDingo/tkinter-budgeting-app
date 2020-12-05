@@ -13,16 +13,23 @@ class User:
         # Muuttujat tuloille ja maksutapahtumien säilyttämiselle
         self.guiIncome = tk.StringVar()
         self.guiExpenses = tk.StringVar()
+        self.monthlyIncome = tk.StringVar()
+        self.monthlyExpenses = tk.StringVar()
         totalIncome = 0
         totalExpenses = 0
         incomeString = totalIncome, "€"
         expensesString = totalExpenses, "€"
         self.guiIncome.set(incomeString)
         self.guiExpenses.set(expensesString)
+        self.monthlyIncome.set(incomeString)
+        self.monthlyExpenses.set(expensesString)
 
         balanceString = totalIncome + totalExpenses, "€"
         self.balance = tk.StringVar()
         self.balance.set(balanceString)
+        self.monthlyBalance = tk.StringVar()
+        self.monthlyBalance.set(balanceString)
+        
         self.transactionList = []
 
 # Luo User-olio ja liitä se käyttöliittymään
