@@ -1,10 +1,9 @@
-# Tuo tkinter-kirjasto GUI:ta varten
-from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
-from tkinter import simpledialog
+# Tuo kirjastot/moduulit käyttöliittymää varten
+import tkinter as tk
+
+# Tuo kirjastot/moduulit toiminnallisuutta varten
 import datetime as dt
-import json
+import json as json
 
 # Transaction-luokka mallintaa maksutapahtumia
 class Transaction:
@@ -29,7 +28,7 @@ class Transaction:
 # Indeksin avulla nappi on sidottu maksutapahtumalistan maksutapahtumaan, joka voidaan tarvittaessa poistaa indeksin avulla
 class RemoveButton:
     def __init__(self, masterWindow, i, toRemoveList):
-        self.removeButton = Button(masterWindow, text="X", command = lambda : self.removeTransaction(toRemoveList))
+        self.removeButton = tk.Button(masterWindow, text="X", command = lambda : self.removeTransaction(toRemoveList))
         self.index = i
         self.state = False
 
@@ -51,20 +50,20 @@ class RemoveButton:
 def addTransaction(root, userObject):
     
     def addTransactionEventWindow(root, transactionList):
-        window = Toplevel(root)
+        window = tk.Toplevel(root)
         window.title("Lisää maksutapahtuma")
         
-        dateLabel = Label(window, text="Päivämäärä [dd.mm.yyyy]:")
-        dateEntry = Entry(window)
+        dateLabel = tk.Label(window, text="Päivämäärä [dd.mm.yyyy]:")
+        dateEntry = tk.Entry(window)
 
-        amountLabel = Label(window, text="Määrä:")
-        amountEntry = Entry(window)
+        amountLabel = tk.Label(window, text="Määrä:")
+        amountEntry = tk.Entry(window)
 
-        descriptionLabel = Label(window, text="Kuvaus:")
-        descriptionEntry = Entry(window)
+        descriptionLabel = tk.Label(window, text="Kuvaus:")
+        descriptionEntry = tk.Entry(window)
 
-        addButton = Button(window, text="Lisää transaktio", command = lambda : createTransaction(dateEntry.get(), amountEntry.get(), descriptionEntry.get(), transactionList, window))
-        exitButton = Button(window, text="Poistu", command = window.destroy)
+        addButton = tk.Button(window, text="Lisää transaktio", command = lambda : createTransaction(dateEntry.get(), amountEntry.get(), descriptionEntry.get(), transactionList, window))
+        exitButton = tk.Button(window, text="Poistu", command = window.destroy)
 
         dateLabel.grid(row=0, column=0)
         dateEntry.grid(row=0, column=1)
@@ -94,16 +93,64 @@ def addTransaction(root, userObject):
 
 # Luo ikkuna maksutapahtumien poistoa varten
 def removeTransactionEventWindow(root, userData):
-    window = Toplevel(root)
+
+    # Täytä ikkuna maksutapahtumilla poistoa varten
+    def populateRemoveWindow(root, userData, incomeFrame, expensesFrame):
+        changedList = userData.transactionList.copy()
+        toRemoveList = [False for i in range(len(changedList))]
+
+        incomeListIndex = 1
+        expensesListIndex = 1
+        for transactionIndex, transaction in enumerate(userData.transactionList):
+            if transaction.sign == "TULO":
+                removeTransactionButton = RemoveButton(incomeFrame, transactionIndex, toRemoveList)
+                printTransactionsToWindow(incomeFrame, transaction, incomeListIndex, removeTransactionButton)
+                incomeListIndex +=1
+            else:
+                removeTransactionButton = RemoveButton(expensesFrame, transactionIndex, toRemoveList)
+                printTransactionsToWindow(expensesFrame, transaction, expensesListIndex, removeTransactionButton)
+                expensesListIndex +=1
+
+        saveButton = tk.Button(root, text="Tallenna muutokset", command = lambda : returnRemovedTransactionList(root, changedList, toRemoveList, userData))
+        saveButton.grid(column=0, row=1, sticky="nw")
+
+    # Poistotapahtuman tallennus päälistaan
+    def returnRemovedTransactionList(root, changedList, toRemoveList, userData):
+        for index, state in enumerate(toRemoveList):
+            if state == True:
+                changedList[index] = False
+        
+        # Karsi kaikki False-arvot eli poistetut maksutapahtumat listasta
+        parsedList = list(filter(None, changedList))
+        # Tallenna karsittu lista päälistaksi
+        userData.transactionList = parsedList
+        root.destroy()
+
+    # Tulosta poistotapahtumaikkunalle maksutapahtumat sekä niitä vastaava poistonappi
+    def printTransactionsToWindow(masterWindow, transaction, listIndex, removeButton):
+        dateText = transaction.date.strftime("%d/%m/%Y")
+        recentItem = tk.Label(masterWindow, text=dateText)
+        recentItem.grid(column=0, row=listIndex)
+
+        amountText = transaction.amount, "€"
+        recentItem = tk.Label(masterWindow, text=amountText)
+        recentItem.grid(column=1, row=listIndex)
+
+        recentItem = tk.Label(masterWindow, text=transaction.description)
+        recentItem.grid(column=2, row=listIndex)
+
+        removeButton.removeButton.grid(column=3, row=listIndex)
+        
+    window = tk.Toplevel(root)
     window.title("Poista maksutapahtumia")
 
-    incomeFrame = ttk.Frame(window, borderwidth=2, relief="sunken", width=50, height=200)
-    expensesFrame = ttk.Frame(window, borderwidth=2, relief="sunken", width=50, height=200)
+    incomeFrame = tk.Frame(window, borderwidth=2, relief="sunken", width=50, height=200)
+    expensesFrame = tk.Frame(window, borderwidth=2, relief="sunken", width=50, height=200)
     incomeFrame.grid(column=1, row=1, sticky="nsew")
     expensesFrame.grid(column=2, row=1, sticky="nsew")
 
-    incomeLabel = ttk.Label(window, text="Tulot")
-    expensesLabel = ttk.Label(window, text="Menot")
+    incomeLabel = tk.Label(window, text="Tulot")
+    expensesLabel = tk.Label(window, text="Menot")
     incomeLabel.grid(column=1, row=0)
     expensesLabel.grid(column=2, row=0)
 
@@ -114,54 +161,6 @@ def removeTransactionEventWindow(root, userData):
     populateRemoveWindow(window, userData, incomeFrame, expensesFrame)
 
     return window
-
-# Täytä ikkuna maksutapahtumilla poistoa varten
-def populateRemoveWindow(root, userData, incomeFrame, expensesFrame):
-    changedList = userData.transactionList.copy()
-    toRemoveList = [False for i in range(len(changedList))]
-
-    incomeListIndex = 1
-    expensesListIndex = 1
-    for transactionIndex, transaction in enumerate(userData.transactionList):
-        if transaction.sign == "TULO":
-            removeTransactionButton = RemoveButton(incomeFrame, transactionIndex, toRemoveList)
-            printTransactionsToWindow(incomeFrame, transaction, incomeListIndex, removeTransactionButton)
-            incomeListIndex +=1
-        else:
-            removeTransactionButton = RemoveButton(expensesFrame, transactionIndex, toRemoveList)
-            printTransactionsToWindow(expensesFrame, transaction, expensesListIndex, removeTransactionButton)
-            expensesListIndex +=1
-
-    saveButton = Button(root, text="Tallenna muutokset", command = lambda : returnRemovedTransactionList(root, changedList, toRemoveList, userData))
-    saveButton.grid(column=0, row=1, sticky="nw")
-
-# Poistotapahtuman tallennus päälistaan
-def returnRemovedTransactionList(root, changedList, toRemoveList, userData):
-    for index, state in enumerate(toRemoveList):
-        if state == True:
-            changedList[index] = False
-    
-    # Karsi kaikki False-arvot eli poistetut maksutapahtumat listasta
-    parsedList = list(filter(None, changedList))
-    # Tallenna karsittu lista päälistaksi
-    userData.transactionList = parsedList
-    root.destroy()
-
-# Tulosta poistotapahtumaikkunalle maksutapahtumat sekä niitä vastaava poistonappi
-def printTransactionsToWindow(masterWindow, transaction, listIndex, removeButton):
-    dateText = transaction.date.strftime("%d/%m/%Y")
-    recentItem = ttk.Label(masterWindow, text=dateText)
-    recentItem.grid(column=0, row=listIndex)
-
-    amountText = transaction.amount, "€"
-    recentItem = ttk.Label(masterWindow, text=amountText)
-    recentItem.grid(column=1, row=listIndex)
-
-    recentItem = ttk.Label(masterWindow, text=transaction.description)
-    recentItem.grid(column=2, row=listIndex)
-
-    removeButton.removeButton.grid(column=3, row=listIndex)
-        
 
 # --- Ohjelman tallennus tiedostoon ja tuonti tiedostosta --- #
 

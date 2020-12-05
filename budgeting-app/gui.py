@@ -1,28 +1,21 @@
-# Tuo tkinter-kirjasto GUI:ta varten
-from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
+# Tuo kirjastot/moduulit käyttöliittymää varten
+import tkinter as tk
+
+# Tuo kirjastot/moduulit toiminnallisuutta varten
 import operator as operator
-
-# Tuo profile-tiedosto, joka sisältää käyttäjän tietoja
 import profile as profile
-
-# Tuo transaction-tiedosto, joka sisältää maksutapahtumiin liittyvät luokat ja metodit
 import transaction as transaction
-
-# Tuo sys ohjelman sammuttamista varten
-import sys
+import sys as sys
 import datetime as dt
 
 class GUI:
     # Luo popup-ikkuna, jonka jälkeen tuhoa ikkuna ja sammuta ohjelma
     def exit(self):
-        messagebox.showinfo("Budjetoija", "Ohjelma sammutetaan.")
+        tk.messagebox.showinfo("Budjetoija", "Ohjelma sammutetaan.")
         root.destroy()
         sys.exit()
 
     # Päivitä maksutapahtumat käymällä lista läpi
-    # Päivitä käyttöliittymästä overview- ja recent-paneelit
     def addTransaction(self):
         transaction.addTransaction(self.root, self.userData)
         print(self.userData)
@@ -41,33 +34,33 @@ class GUI:
             widget.destroy()
 
         # Aseta otsikot
-        self.recentLabel = ttk.Label(self.recent, text="Viimeaikainen toiminta")
+        self.recentLabel = tk.Label(self.recent, text="Viimeaikainen toiminta")
         self.recentLabel.grid(column=0, row=0, columnspan=3)
 
-        self.dateLabel = ttk.Label(self.recent, text="Päivämäärä")
+        self.dateLabel = tk.Label(self.recent, text="Päivämäärä")
         self.dateLabel.grid(column=0, row=1)
-        self.amountLabel = ttk.Label(self.recent, text="Määrä")
+        self.amountLabel = tk.Label(self.recent, text="Määrä")
         self.amountLabel.grid(column=1, row=1)
-        self.descriptionLabel = ttk.Label(self.recent, text="Kuvaus")
+        self.descriptionLabel = tk.Label(self.recent, text="Kuvaus")
         self.descriptionLabel.grid(column=2, row=1)
 
+        # Laske uudet arvot käymällä lista läpi
         totalIncome = 0
         totalExpenses = 0
         for rowIndex, transaction in enumerate(self.userData.transactionList):
-            # Päivitä recent-paneeli
-            print(transaction.date)
+            # Tulosta tapahtumat annetulle ikkunalle
             dateText = transaction.date.strftime("%d/%m/%Y")
-            recentItem = ttk.Label(masterWindow, text=dateText)
+            recentItem = tk.Label(masterWindow, text=dateText)
             recentItem.grid(column=0, row=rowIndex+2)
 
             amountText = transaction.amount, "€"
-            recentItem = ttk.Label(masterWindow, text=amountText)
+            recentItem = tk.Label(masterWindow, text=amountText)
             recentItem.grid(column=1, row=rowIndex+2)
 
-            recentItem = ttk.Label(masterWindow, text=transaction.description)
+            recentItem = tk.Label(masterWindow, text=transaction.description)
             recentItem.grid(column=2, row=rowIndex+2)
 
-            # Päivitä yleiskatsaus paneeli
+            # Laske uudet arvot kokonaistulolle ja -menolle
             if transaction.amount >= 0:
                 totalIncome += transaction.amount
 
@@ -77,6 +70,7 @@ class GUI:
             else:
                 pass
         
+        # Aseta uudet arvot StringVar()-muuttujalle
         incomeString = totalIncome, "€"
         expensesString = totalExpenses, "€"
         self.userData.guiIncome.set(incomeString)
@@ -84,6 +78,7 @@ class GUI:
         balanceString = totalIncome + totalExpenses, "€"
         self.userData.balance.set(balanceString)
 
+    # Maksutapahtumien poisto
     def removeTransactions(self):
         eventWindow = transaction.removeTransactionEventWindow(self.root, self.userData)
         eventWindow.wait_window(eventWindow)
@@ -91,6 +86,7 @@ class GUI:
         self.sortTransactions()
         self.printTransactions(self.recent)
 
+    # Tiedostosta tuonti
     def importTranscations(self):
         self.userData.transactionList = transaction.importTransactions(self.userData)
         self.sortTransactions()
@@ -102,13 +98,13 @@ class GUI:
         self.userData = userObject
 
         # Pääraamit ohjelmalle
-        self.mainframe = ttk.Frame(self.root, borderwidth=10, padding=(3,3,12,12), width=10, height=10)
+        self.mainframe = tk.Frame(self.root, borderwidth=10, padding=(3,3,12,12), width=10, height=10)
 
         # Paneelit eri osille
-        self.info = ttk.Frame(self.mainframe, borderwidth=2, relief="sunken", width=200, height=50)
-        self.panel = ttk.Frame(self.mainframe, borderwidth=2, relief="sunken", width=50, height=200)
-        self.overview = ttk.Frame(self.mainframe, borderwidth=2, relief="sunken", width=150, height=200)
-        self.recent = ttk.Frame(self.mainframe, borderwidth=2, relief="sunken", width=100, height=250)
+        self.info = tk.Frame(self.mainframe, borderwidth=2, relief="sunken", width=200, height=50)
+        self.panel = tk.Frame(self.mainframe, borderwidth=2, relief="sunken", width=50, height=200)
+        self.overview = tk.Frame(self.mainframe, borderwidth=2, relief="sunken", width=150, height=200)
+        self.recent = tk.Frame(self.mainframe, borderwidth=2, relief="sunken", width=100, height=250)
 
         # Aseta paneelit
         self.mainframe.grid(column=0, row=0, sticky="nsew", pady=(2,2), padx=(2,2))
@@ -118,35 +114,35 @@ class GUI:
         self.recent.grid(column=2, row=1, rowspan=2, sticky="nsew", pady=(2,2), padx=(2,2))
 
         # Info-paneelin sisältö
-        self.infoLabel = ttk.Label(self.info, text="Info")
+        self.infoLabel = tk.Label(self.info, text="Info")
         self.infoLabel.grid(column=0, row=0, sticky="nw", pady=(2,2), padx=(2,2))
 
-        self.nameLabel = ttk.Label(self.info, textvariable=userObject.userName)
-        self.infoName = ttk.Label(self.info, text="Nimi:")
+        self.nameLabel = tk.Label(self.info, textvariable=userObject.userName)
+        self.infoName = tk.Label(self.info, text="Nimi:")
         self.infoName.grid(column=1, row=1, sticky="nw")
         self.nameLabel.grid(column=2, row=1, sticky="nw")
 
-        self.ageLabel = ttk.Label(self.info, textvariable=userObject.userAge)
-        self.infoAge = ttk.Label(self.info, text="Ikä")
+        self.ageLabel = tk.Label(self.info, textvariable=userObject.userAge)
+        self.infoAge = tk.Label(self.info, text="Ikä")
         self.infoAge.grid(column=1, row=2, sticky="nw")
         self.ageLabel.grid(column=2, row=2, sticky="nw")
 
-        self.editButton = Button(self.info, text="Muokkaa", command = lambda : profile.updateInfo(root, userObject))
+        self.editButton = tk.Button(self.info, text="Muokkaa", command = lambda : profile.updateInfo(root, userObject))
         self.editButton.grid(column=1, row=0)
 
         # Panel-paneelin sisältö
-        self.panelLabel = ttk.Label(self.panel, text="Hallintapaneeli")
+        self.panelLabel = tk.Label(self.panel, text="Hallintapaneeli")
         self.panelLabel.grid(column=0, row=0, pady=(2,0), padx=(2,2))
 
-        self.addTransactionButton = Button(self.panel, text="Lisää transaktio", command=lambda: self.addTransaction())
-        self.removeTransactionButton = Button(self.panel, text="Poista transaktio", command=lambda : self.removeTransactions())
+        self.addTransactionButton = tk.Button(self.panel, text="Lisää transaktio", command=lambda: self.addTransaction())
+        self.removeTransactionButton = tk.Button(self.panel, text="Poista transaktio", command=lambda : self.removeTransactions())
 
-        self.importButton = Button(self.panel, text="Tuo tiedosto", command=lambda: self.importTranscations())
-        self.exportButton = Button(self.panel, text="Vie tiedosto", command=lambda: transaction.exportTransactions(self.userData))
+        self.importButton = tk.Button(self.panel, text="Tuo tiedosto", command=lambda: self.importTranscations())
+        self.exportButton = tk.Button(self.panel, text="Vie tiedosto", command=lambda: transaction.exportTransactions(self.userData))
 
-        self.exitButton = Button(self.panel, text="Poistu", command=self.exit)
+        self.exitButton = tk.Button(self.panel, text="Poistu", command=self.exit)
 
-        self.testButton = Button(self.panel, text="Testi", command=lambda : self.sortTransactions())
+        self.testButton = tk.Button(self.panel, text="Testi", command=lambda : self.sortTransactions())
 
         self.addTransactionButton.grid(column=0, row=1, pady=(5,0), padx=(5,5))
         self.removeTransactionButton.grid(column=0, row=2, pady=(1,0), padx=(5,5))
@@ -159,17 +155,17 @@ class GUI:
         self.testButton.grid(column=0, row=6, pady=(1,5), padx=(5,5))
 
         # Overview-paneelin sisältö
-        self.overviewLabel = ttk.Label(self.overview, text="Yleiskatsaus")
+        self.overviewLabel = tk.Label(self.overview, text="Yleiskatsaus")
         self.overviewLabel.grid(column=0, row=0, pady=(2,2), padx=(2,2))
 
-        self.incomeLabel = ttk.Label(self.overview, text="Tulot:")
-        self.incomeContent = ttk.Label(self.overview, textvariable=userObject.guiIncome)
+        self.incomeLabel = tk.Label(self.overview, text="Tulot:")
+        self.incomeContent = tk.Label(self.overview, textvariable=userObject.guiIncome)
 
-        self.expensesLabel = ttk.Label(self.overview, text="Menot:")
-        self.expensesContent = ttk.Label(self.overview, textvariable=userObject.guiExpenses)
+        self.expensesLabel = tk.Label(self.overview, text="Menot:")
+        self.expensesContent = tk.Label(self.overview, textvariable=userObject.guiExpenses)
 
-        self.balanceLabel = ttk.Label(self.overview, text="Yhteensä:")
-        self.balanceContent = ttk.Label(self.overview, textvariable=userObject.balance)
+        self.balanceLabel = tk.Label(self.overview, text="Yhteensä:")
+        self.balanceContent = tk.Label(self.overview, textvariable=userObject.balance)
 
         self.incomeLabel.grid(column=0, row=1)
         self.incomeContent.grid(column=1, row=1)
@@ -179,14 +175,14 @@ class GUI:
         self.balanceContent.grid(column=1, row=4)
 
         # Recent-paneelin sisältö
-        self.recentLabel = ttk.Label(self.recent, text="Viimeaikainen toiminta")
+        self.recentLabel = tk.Label(self.recent, text="Viimeaikainen toiminta")
         self.recentLabel.grid(column=0, row=0, columnspan=3, pady=(2,2), padx=(2,2))
 
-        self.dateLabel = ttk.Label(self.recent, text="Päivämäärä")
+        self.dateLabel = tk.Label(self.recent, text="Päivämäärä")
         self.dateLabel.grid(column=0, row=1)
-        self.amountLabel = ttk.Label(self.recent, text="Määrä")
+        self.amountLabel = tk.Label(self.recent, text="Määrä")
         self.amountLabel.grid(column=1, row=1)
-        self.descriptionLabel = ttk.Label(self.recent, text="Kuvaus")
+        self.descriptionLabel = tk.Label(self.recent, text="Kuvaus")
         self.descriptionLabel.grid(column=2, row=1)
 
         # Ikkunan koon muutoksen hallinta
@@ -200,4 +196,4 @@ class GUI:
         self.mainframe.rowconfigure(0, weight=0)
         self.mainframe.rowconfigure(1, weight=1)
 
-root = Tk()
+root = tk.Tk()

@@ -1,3 +1,4 @@
+# Tuo kirjastot/moduulit käyttöliittymää varten
 import tkinter as tk
 
 def updateInfo(root, userObject):
@@ -25,7 +26,7 @@ def updateInfo(root, userObject):
         return window
 
     # Aseta annetut parametrit StringVar-tyypin muuttujiin
-    # StringVar päivittää tiedot automaattisesti
+    # StringVar päivittää tiedot automaattisesti käyttöliittymään
     def editInfo(name, age, userName, userAge, window):
         userName.set(name)
         userAge.set(age)

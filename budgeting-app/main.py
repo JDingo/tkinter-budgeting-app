@@ -1,5 +1,5 @@
+# Tuo kirjastot/moduulit käyttöliittymää varten
 import tkinter as tk
-
 import gui as gui
 
 class User:
@@ -25,7 +25,10 @@ class User:
         self.balance.set(balanceString)
         self.transactionList = []
 
+# Luo User-olio ja liitä se käyttöliittymään
 userObject = User()
 gui = gui.GUI(userObject)
 gui.root.minsize(500, 320)
+
+# Käyynistä käyttöliittymä tapahtumia ja käyttöliittymän päivittämistä varten
 gui.root.mainloop()
