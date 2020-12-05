@@ -18,7 +18,6 @@ class GUI:
     # Päivitä maksutapahtumat käymällä lista läpi
     def addTransaction(self):
         transaction.addTransaction(self.root, self.userData)
-        print(self.userData)
         self.sortTransactions()
         self.printTransactions(self.recent)
 
@@ -37,14 +36,13 @@ class GUI:
         currentMonthYear = dt.datetime.now().strftime("%m.%Y")
 
         # Aseta otsikot
-        self.recentLabel = tk.Label(self.recent, text="Viimeaikainen toiminta")
+        self.recentLabel = tk.Label(masterWindow, text="Viimeaikainen toiminta", font="bold")
         self.recentLabel.grid(column=0, row=0, columnspan=3)
-
-        self.dateLabel = tk.Label(self.recent, text="Päivämäärä")
+        self.dateLabel = tk.Label(masterWindow, text="Päivämäärä")
         self.dateLabel.grid(column=0, row=1)
-        self.amountLabel = tk.Label(self.recent, text="Määrä")
+        self.amountLabel = tk.Label(masterWindow, text="Määrä")
         self.amountLabel.grid(column=1, row=1)
-        self.descriptionLabel = tk.Label(self.recent, text="Kuvaus")
+        self.descriptionLabel = tk.Label(masterWindow, text="Kuvaus")
         self.descriptionLabel.grid(column=2, row=1)
 
         # Laske uudet arvot käymällä lista läpi

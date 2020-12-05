@@ -11,7 +11,6 @@ class Transaction:
     # Luokan attribuutteja on päivämäärä, euromääräinen arvo, kuvaus maksutapahtumasta ja tapahtuman arvon laatu
     def __init__(self, date, amount, description):
         separatedDate = date.split(".")
-        print(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
 
         dateObject = dt.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
         self.date = dateObject
@@ -79,7 +78,6 @@ def addTransaction(root, userObject):
 
     def createTransaction(date, amount, description, transactionList, eventWindow):
         transactionObject = Transaction(date, int(amount), description)
-        print(transactionObject, transactionObject.date, transactionObject.amount, transactionObject.description)
 
         transactionList.append(transactionObject)
 
