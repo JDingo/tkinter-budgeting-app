@@ -27,5 +27,5 @@ class User:
 
 userObject = User()
 gui = gui.GUI(userObject)
-gui.root.minsize(500, 300)
+gui.root.minsize(500, 320)
 gui.root.mainloop()
