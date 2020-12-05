@@ -12,8 +12,8 @@ import datetime as dt
 class GUI:
     # Luo popup-ikkuna, jonka jälkeen tuhoa ikkuna ja sammuta ohjelma
     def exit(self):
-        quitDialog = messagebox.askyesno("Budjetoija", "Oletko varma, että haluat sammuttaa ohjelman? Kaikki tallentamattomat muutokset menetetään.")
-        if quitDialog == True:
+        if messagebox.askyesno("Poistu", 
+                                "Oletko varma, että haluat sammuttaa ohjelman? Kaikki tallentamattomat muutokset menetetään."):
             root.destroy()
             sys.exit()
         else:
@@ -117,6 +117,7 @@ class GUI:
     def __init__(self, userObject):
         self.root = root
         root.title("Budjetoija")
+        root.protocol("WM_DELETE_WINDOW", self.exit)
         self.userData = userObject
 
         # Pääraamit ohjelmalle
