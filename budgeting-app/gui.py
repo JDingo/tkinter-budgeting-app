@@ -1,5 +1,6 @@
 # Tuo kirjastot/moduulit käyttöliittymää varten
 import tkinter as tk
+from tkinter import messagebox
 
 # Tuo kirjastot/moduulit toiminnallisuutta varten
 import operator as operator
@@ -11,9 +12,12 @@ import datetime as dt
 class GUI:
     # Luo popup-ikkuna, jonka jälkeen tuhoa ikkuna ja sammuta ohjelma
     def exit(self):
-        tk.messagebox.showinfo("Budjetoija", "Ohjelma sammutetaan.")
-        root.destroy()
-        sys.exit()
+        quitDialog = messagebox.askyesno("Budjetoija", "Oletko varma, että haluat sammuttaa ohjelman? Kaikki tallentamattomat muutokset menetetään.")
+        if quitDialog == True:
+            root.destroy()
+            sys.exit()
+        else:
+            pass
 
     # Päivitä maksutapahtumat käymällä lista läpi
     def addTransaction(self):
