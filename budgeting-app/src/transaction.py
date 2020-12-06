@@ -83,7 +83,7 @@ def validateUserInput(dateEntry, amountEntry, date, amount, description, transac
     try:
         amount = round(float(amount), 2)
         amountEntry.configure(bg="SystemWindow")
-    except ValueError:
+    except:
         amountEntry.configure(bg="salmon")
         window.bell()
         error = True
@@ -92,13 +92,13 @@ def validateUserInput(dateEntry, amountEntry, date, amount, description, transac
         separatedDate = date.split(".")
         dateObject = dt.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
         dateEntry.configure(bg="SystemWindow")
-    except IndexError:
+    except:
         dateEntry.configure(bg="salmon")
         window.bell()
         error = True
 
     if error:
-        return None
+        return error
     else:
         createTransaction(dateObject, amount, description, transactionList, window)
 
