@@ -5,19 +5,19 @@ import json
 
 from src import transaction
 
+root = tk.Tk()
+dummyFrame = tk.Frame(root)
+dummyEntry = tk.Entry(root)
+dummyList = []
+
 class TestTransaction(unittest.TestCase):
 
     # Maksutapahtumien datan verifioinnin testaus
+    # Testaa validateUserInput ja createTransaction -metodit
     def test_user_input_validation(self):
-        root = tk.Tk()
-        dummyFrame = tk.Frame(root)
-        dummyEntry = tk.Entry(root)
-        dummyList = []
-
-        description = ""
-        
         # Testidata TestData.json-tiedostossa
         with open("tests/testData.json", "r") as testDataFile:
+            description = ""
             testData = json.load(testDataFile)
 
             # Testaa oikeelliset arvot,
@@ -25,7 +25,7 @@ class TestTransaction(unittest.TestCase):
             for amountDataElement in testData["ValidAmounts"]:
                 for dateDateElement in testData["ValidDates"]:
                     result = transaction.validateUserInput(dummyEntry, dummyEntry, dateDateElement, amountDataElement, description, dummyList, dummyFrame)
-                    self.assertIsNone(result)
+                    self.assertTrue(isinstance(result, transaction.Transaction))
 
             # Testaa viallisia arvoja,
             # metodi palauttaa error-muuttujan, odotettu arvo: True

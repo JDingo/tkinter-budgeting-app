@@ -100,8 +100,8 @@ def validateUserInput(dateEntry, amountEntry, date, amount, description, transac
     if error:
         return error
     else:
-        createTransaction(dateObject, amount, description, transactionList, window)
-
+        transactionObject = createTransaction(dateObject, amount, description, transactionList, window)
+        return transactionObject
 
 # Luo maksutapahtuma Transaction-oliona
 def createTransaction(dateObject, amount, description, transactionList, window):
