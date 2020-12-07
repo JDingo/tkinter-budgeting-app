@@ -10,22 +10,21 @@ import sys as sys
 import datetime as dt
 
 class GUI:
+
     # Luo popup-ikkuna, jonka jälkeen tuhoa ikkuna ja sammuta ohjelma
     def exit(self):
-        if messagebox.askyesno("Poistu", 
-                                "Oletko varma, että haluat sammuttaa ohjelman? Kaikki tallentamattomat muutokset menetetään."):
+        if messagebox.askyesno("Poistu", "Oletko varma, että haluat sammuttaa ohjelman? Kaikki tallentamattomat muutokset menetetään."):
             root.destroy()
             sys.exit()
+
+        # Jatka ohjelmaa, mikäli käyttäjä ei paina "kyllä"
         else:
             return None
 
-    # Päivitä maksutapahtumat käymällä lista läpi
-    def addTransaction(self):
-        transaction.addTransaction(self.root, self.userData)
-        self.sortTransactions()
-        self.printTransactions(self.recent)
+    # --- Maksutapahtumalistan tulostus pääikkunalle --- #
 
-    # Järjestä maksutapahtumat aikajärjestykseen uusimmasta vanhimpaan tulostusta varten
+    # Järjestä maksutapahtumat aikajärjestykseen 
+    # uusimmasta vanhimpaan tulostusta varten
     def sortTransactions(self):
         self.userData.transactionList.sort(key=operator.attrgetter("date"), reverse=True)
 
@@ -86,8 +85,7 @@ class GUI:
             else:
                 print("Virhe summien laskussa!")
         
-        # Aseta uudet arvot StringVar()-muuttujalle
-        print(totalIncome, totalExpenses)
+        # Aseta uudet arvot StringVar()-muuttujille
         incomeString = totalIncome, "€"
         expensesString = totalExpenses, "€"
         monthlyIncomeString = monthlyIncome, "€"
@@ -102,24 +100,49 @@ class GUI:
         self.userData.balance.set(balanceString)
         self.userData.monthlyBalance.set(monthlyBalanceString)
 
+    # --- Käyttöliittymän painikkeiden toiminnallisuus --- #
+
+    # Lisää maksutapahtuma
+    def addTransaction(self):
+        # Luo ikkuna ja odota, kunnes ikkuna tuhotaan
+        window = transaction.addTransactionEventWindow(self.root, self.userData.transactionList)
+        window.wait_window(window)
+
+        # Järjestä lista ja tulosta ikkunalle
+        self.sortTransactions()
+        self.printTransactions(self.recent)
+
     # Maksutapahtumien poisto
     def removeTransactions(self):
-        eventWindow = transaction.removeTransactionEventWindow(self.root, self.userData)
-        eventWindow.wait_window(eventWindow)
-        print("Poistotapahtuma suoritettu!")
+        # Luo ikkuna ja odota, kunnes ikkuna tuhotaan
+        window = transaction.removeTransactionEventWindow(self.root, self.userData)
+        window.wait_window(window)
+
+        # Järjestä lista ja tulosta ikkunalle
         self.sortTransactions()
         self.printTransactions(self.recent)
 
     # Tiedostosta tuonti
     def importTranscations(self):
+        # Aseta maksutapahtumien lista palautetuksi listaksi
         self.userData.transactionList = transaction.importTransactions(self.userData)
+
+        # Järjestä lista ja tulosta ikkunalle
         self.sortTransactions()
         self.printTransactions(self.recent)
 
+    # --- Ohjelman pääikkunan luonti --- #
+
+    # Luo pääikkuna
     def __init__(self, userObject):
         self.root = root
         root.title("Budjetoija")
+
+        # Käsittele tapahtuma,
+        # missä käyttäjä sulkee käyttöliittymän käyttöjärjestelmän ikkunamanagerin kautta
         root.protocol("WM_DELETE_WINDOW", self.exit)
+
+        # Kiinnitä käyttäjän data tähän instanssiin
         self.userData = userObject
 
         # Pääraamit ohjelmalle
@@ -132,6 +155,7 @@ class GUI:
         self.recent = tk.Frame(self.mainframe, borderwidth=2, relief="sunken", width=100, height=250)
 
         # Aseta paneelit
+        # Paneelit asetetaan ruudukkoon .grid() avulla
         self.mainframe.grid(column=0, row=0, sticky="nsew", pady=(2,2), padx=(2,2))
         self.info.grid(column=0, row=0, columnspan=3, sticky="nsew", pady=(2,2), padx=(2,2))
         self.panel.grid(column=0, row=1, sticky="nsew", pady=(2,2), padx=(2,2))
@@ -152,7 +176,10 @@ class GUI:
         self.infoAge.grid(column=1, row=2, sticky="nw")
         self.ageLabel.grid(column=2, row=2, sticky="nw")
 
-        self.editButton = tk.Button(self.info, text="Muokkaa", command = lambda : profile.updateInfo(root, userObject))
+        # Painikkeiden kytkemisessä metodeihin käytetään lambdaa
+        # Ilman lambdaa, Python suorittaa funktion heti ja palauttaa sen TkInterille
+        # Lambdan avulla metodi kytketään anonyymiin funktioon ja kutsutaan vasta nappia painettaessa
+        self.editButton = tk.Button(self.info, text="Muokkaa", command = lambda : profile.updateInfo(root, self.userData))
         self.editButton.grid(column=1, row=0)
 
         # Panel-paneelin sisältö
@@ -167,8 +194,6 @@ class GUI:
 
         self.exitButton = tk.Button(self.panel, text="Poistu", command=self.exit)
 
-        self.testButton = tk.Button(self.panel, text="Testi", command=lambda : self.sortTransactions())
-
         self.addTransactionButton.grid(column=0, row=1, pady=(5,0), padx=(5,5))
         self.removeTransactionButton.grid(column=0, row=2, pady=(1,0), padx=(5,5))
 
@@ -176,8 +201,6 @@ class GUI:
         self.exportButton.grid(column=0, row=4, pady=(1,0), padx=(5,5))
 
         self.exitButton.grid(column=0, row=5, pady=(5,0), padx=(5,5))
-
-        self.testButton.grid(column=0, row=6, pady=(1,5), padx=(5,5))
 
         # Overview-paneelin sisältö
         self.overviewLabel = tk.Label(self.overview, text="Yleiskatsaus", font="bold")
@@ -202,11 +225,11 @@ class GUI:
         self.totalLabel = tk.Label(self.overview, text="Koko budjetti")
         self.monthlyLabel = tk.Label(self.overview, text="Kuukauden budjetti")
         self.incomeLabel = tk.Label(self.overview, text="Tulot:")
-        self.incomeContent = tk.Label(self.overview, textvariable=userObject.guiIncome)
+        self.incomeContent = tk.Label(self.overview, textvariable=self.userData.guiIncome)
         self.expensesLabel = tk.Label(self.overview, text="Menot:")
-        self.expensesContent = tk.Label(self.overview, textvariable=userObject.guiExpenses)
+        self.expensesContent = tk.Label(self.overview, textvariable=self.userData.guiExpenses)
         self.balanceLabel = tk.Label(self.overview, text="Yhteensä:")
-        self.balanceContent = tk.Label(self.overview, textvariable=userObject.balance)
+        self.balanceContent = tk.Label(self.overview, textvariable=self.userData.balance)
 
         self.totalLabel.grid(column=0, row=5, sticky="w", pady=(2,0))
         self.incomeLabel.grid(column=0, row=6)

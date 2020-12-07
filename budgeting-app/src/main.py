@@ -10,26 +10,31 @@ class User:
         self.userName.set("")
         self.userAge.set("")
 
-        # Muuttujat tuloille ja maksutapahtumien säilyttämiselle
+        # Muuttujat tuloille ja menoille
         self.guiIncome = tk.StringVar()
         self.guiExpenses = tk.StringVar()
         self.monthlyIncome = tk.StringVar()
         self.monthlyExpenses = tk.StringVar()
+
+        # Luodaan numeeriset arvot ja muutetaan merkkijonoiksi StringVar()-varten
         totalIncome = 0
         totalExpenses = 0
         incomeString = totalIncome, "€"
         expensesString = totalExpenses, "€"
+
         self.guiIncome.set(incomeString)
         self.guiExpenses.set(expensesString)
         self.monthlyIncome.set(incomeString)
         self.monthlyExpenses.set(expensesString)
 
+        # Muuttujat yhteenvedoille
         balanceString = totalIncome + totalExpenses, "€"
         self.balance = tk.StringVar()
         self.balance.set(balanceString)
         self.monthlyBalance = tk.StringVar()
         self.monthlyBalance.set(balanceString)
         
+        # Lista maksutapahtumille
         self.transactionList = []
 
 # Luo User-olio ja liitä se käyttöliittymään
@@ -37,5 +42,6 @@ userObject = User()
 gui = gui.GUI(userObject)
 gui.root.minsize(500, 320)
 
-# Käyynistä käyttöliittymä tapahtumia ja käyttöliittymän päivittämistä varten
+# Käynnistä TkInter-mainloop
+# mainloop tarkastelee käyttäjän syötettä ja päivittää käyttöliittymää tarvittaessa
 gui.root.mainloop()

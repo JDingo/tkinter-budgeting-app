@@ -8,20 +8,15 @@ import json as json
 # Transaction-luokka mallintaa maksutapahtumia
 class Transaction:
 
-    # Luokan attribuutteja on päivämäärä, euromääräinen arvo, kuvaus maksutapahtumasta ja tapahtuman arvon laatu
+    # Luokan attribuutteja on päivämäärä, euromääräinen arvo, kuvaus maksutapahtumasta
     def __init__(self, dateObject, amount, description):
         self.date = dateObject
         self.amount = amount
-
-        # Asetetaan maksutapahtumalle arvon laatua vastaava merkitys
-        if amount >= 0:
-            self.sign = "TULO"
-        else:
-            self.sign = "MENO"
         self.description = description
 
 # RemoveButton-luokka mallintaa nappia, joka pitää sisällään myös indeksin
-# Indeksin avulla nappi on sidottu maksutapahtumalistan maksutapahtumaan, joka voidaan tarvittaessa poistaa indeksin avulla
+# Indeksin avulla nappi on sidottu maksutapahtumalistan maksutapahtumaan, 
+# joka voidaan tarvittaessa poistaa indeksin avulla
 class RemoveButton:
     def __init__(self, masterWindow, i, toRemoveList):
         self.removeButton = tk.Button(masterWindow, text="X", command = lambda : self.removeTransaction(toRemoveList))
@@ -43,11 +38,7 @@ class RemoveButton:
 
 # --- Maksutapahtuman lisäystoiminta --- #
 
-def addTransaction(root, userObject):
-    eventWindow = addTransactionEventWindow(root, userObject.transactionList)
-    eventWindow.wait_window(eventWindow)
-    print("Tapahtuma lisätty!")
-
+# Luo ikkuna maksutapahtuman lisäykselle
 def addTransactionEventWindow(root, transactionList):
         window = tk.Toplevel(root)
         window.title("Lisää maksutapahtuma")
@@ -80,6 +71,10 @@ def addTransactionEventWindow(root, transactionList):
 # Käyttäjän syötteen validointi
 def validateUserInput(dateEntry, amountEntry, date, amount, description, transactionList, window):
     error = False
+
+    # Varmista syötteen oikeellisuus
+    # Värjää virheelliset syötekentät tarvittaessa
+    # window.bell() soittaa äänen virheiden sattuessa
     try:
         amount = round(float(amount), 2)
         amountEntry.configure(bg="SystemWindow")
@@ -98,19 +93,22 @@ def validateUserInput(dateEntry, amountEntry, date, amount, description, transac
         error = True
 
     if error:
+        # Palauta arvo testiä varten ja poistu metodista
         return error
     else:
         transactionObject = createTransaction(dateObject, amount, description, transactionList, window)
+
+        # Palauta olio testiä varten
         return transactionObject
 
 # Luo maksutapahtuma Transaction-oliona
 def createTransaction(dateObject, amount, description, transactionList, window):
+    # Luo olio, lisää listaan ja tuhoa ikkuna, ohjelma jatkuu main-moduulissa
     transactionObject = Transaction(dateObject, amount, description)
-
     transactionList.append(transactionObject)
-
     window.destroy()
 
+    # Palauta olio testiä vartens
     return transactionObject
     
 # --- Maksutapahtumien poistotoiminta --- #
@@ -120,13 +118,19 @@ def removeTransactionEventWindow(root, userData):
 
     # Täytä ikkuna maksutapahtumilla poistoa varten
     def populateRemoveWindow(root, userData, incomeFrame, expensesFrame):
+        # Luo kopio alkuperäisestä listasta
+        # Luo merkintälista, johon merkitään poistettavat maksutapahtumat
         changedList = userData.transactionList.copy()
         toRemoveList = [False for i in range(len(changedList))]
 
-        incomeListIndex = 1
-        expensesListIndex = 1
-        for transactionIndex, transaction in enumerate(userData.transactionList):
-            if transaction.sign == "TULO":
+        # Tulostukseen erilliset indeksit, 
+        # jotta maksutapahtumat pysyvät järjestyksessä kahdesta eri ikkunasta huolimatta
+        incomeListIndex = 0
+        expensesListIndex = 0
+
+        # Käy läpi kaikki maksutapahtumat kopiolistasta
+        for transactionIndex, transaction in enumerate(changedList):
+            if transaction.amount >= 0:
                 removeTransactionButton = RemoveButton(incomeFrame, transactionIndex, toRemoveList)
                 printTransactionsToWindow(incomeFrame, transaction, incomeListIndex, removeTransactionButton)
                 incomeListIndex +=1
@@ -140,14 +144,19 @@ def removeTransactionEventWindow(root, userData):
 
     # Poistotapahtuman tallennus päälistaan
     def returnRemovedTransactionList(root, changedList, toRemoveList, userData):
+        # Jos merkintälistaan on merkattu indeksin kohdalle True,
+        # aseta maksutapahtumalistaan False
         for index, state in enumerate(toRemoveList):
             if state == True:
                 changedList[index] = False
         
         # Karsi kaikki False-arvot eli poistetut maksutapahtumat listasta
         parsedList = list(filter(None, changedList))
-        # Tallenna karsittu lista päälistaksi
+
+        # Tallenna käsitelty lista käyttäjän maksutapahtumalistaksi
         userData.transactionList = parsedList
+
+        # Tuhoa ikkuna
         root.destroy()
 
     # Tulosta poistotapahtumaikkunalle maksutapahtumat sekä niitä vastaava poistonappi
@@ -164,7 +173,8 @@ def removeTransactionEventWindow(root, userData):
         recentItem.grid(column=2, row=listIndex)
 
         removeButton.removeButton.grid(column=3, row=listIndex)
-        
+
+    # Poistoikkunan luonti
     window = tk.Toplevel(root)
     window.title("Poista maksutapahtumia")
 
@@ -190,22 +200,39 @@ def removeTransactionEventWindow(root, userData):
 
 # Ohjelman tietojen vienti json-tiedostoksi
 def exportTransactions(userData):
+    
+    # Aseta tallenukseen ensiksi käyttäjän ikä
     exportDict = {"name": userData.userName.get(), "age": userData.userAge.get(), "transactions": []}
     with open("transactionData.json","w") as transactionFile:
+
+        # Käy jokainen maksutapahtuma ja lisää ne tallennettavaksi avain-arvo-pareina
         for i in userData.transactionList:
             stringDate = i.date.strftime("%d.%m.%Y")
-            data = {"date": stringDate, "amount": i.amount, "sign": i.sign, "description": i.description}
+            data = {"date": stringDate, "amount": i.amount, "description": i.description}
             exportDict["transactions"].append(data)
 
+        # Tallenna json.tiedosto
         json.dump(exportDict, transactionFile)
 
 # json-tiedoston tuonti ohjelman tietoihin
 def importTransactions(userData):
+
+    # Luo tyhjä lista, joka palautetaan
     transactionsList = []
+
     with open("transactionData.json","r") as transactionFile:
         jsonFile = json.load(transactionFile)
+
+        # Tallenna käyttäjälle suoraan käyttäjätiedot
         userData.userName.set(jsonFile["name"])
         userData.userAge.set(jsonFile["age"])
+
+        # Maksutapahtumien tuonnissa ei käydä läpi tietojen oikeellisuutta
+        # Oletetaan oikeiksi
+
+        # Käy jokainen tallennettu maksutapahtuma läpi
+        # Käsittele jokainen avain-arvo-pari Transaction-olioksi
+        # Tallenna ne palautettavaan listaan
         for transaction in jsonFile["transactions"]:
             separatedDate = transaction["date"].split(".")
             dateObject = dt.datetime(int(separatedDate[2]), int(separatedDate[1]), int(separatedDate[0]))
