@@ -1,6 +1,6 @@
 # Tuo kirjastot/moduulit käyttöliittymää varten
 import tkinter as tk
-import gui as gui
+import gui
 
 class User:
     def __init__(self):

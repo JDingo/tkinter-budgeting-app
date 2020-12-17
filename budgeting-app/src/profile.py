@@ -32,7 +32,7 @@ def updateInfo(root, userObject):
         userAge.set(age)
         window.destroy()
 
+    # Luo ikkuna
     eventWindow = editInfoEventWindow(root, userObject.userName, userObject.userAge)
+    # Jatka, kun aiemmin luotu ikkuna tuhotaan
     eventWindow.wait_window(eventWindow)
-    
-    print("Muokattu info!")

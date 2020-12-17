@@ -3,10 +3,10 @@ import tkinter as tk
 from tkinter import messagebox
 
 # Tuo kirjastot/moduulit toiminnallisuutta varten
-import operator as operator
-import profile as profile
-import transaction as transaction
-import sys as sys
+import operator
+import profile
+import transaction
+import sys
 import datetime as dt
 
 class GUI:
@@ -29,10 +29,10 @@ class GUI:
         self.userData.transactionList.sort(key=operator.attrgetter("date"), reverse=True)
 
     # Tulosta maksutapahtumat syötetylle ikkunalle masterWindow
-    def printTransactions(self, masterWindow):
+    def printTransactions(self):
 
         # Siivoa annettu raami uudelleenpiirtoa varten
-        for widget in masterWindow.winfo_children():
+        for widget in self.recent.winfo_children():
             widget.destroy()
 
         # Tarkista tämänhetkinen vuosi ja kuukausi
@@ -57,14 +57,14 @@ class GUI:
         for rowIndex, transaction in enumerate(self.userData.transactionList):
             # Tulosta tapahtumat annetulle ikkunalle
             dateText = transaction.date.strftime("%d.%m.%Y")
-            recentItem = tk.Label(masterWindow, text=dateText)
+            recentItem = tk.Label(self.recent, text=dateText)
             recentItem.grid(column=0, row=rowIndex+2)
 
             amountText = transaction.amount, "€"
-            recentItem = tk.Label(masterWindow, text=amountText)
+            recentItem = tk.Label(self.recent, text=amountText)
             recentItem.grid(column=1, row=rowIndex+2)
 
-            recentItem = tk.Label(masterWindow, text=transaction.description)
+            recentItem = tk.Label(self.recent, text=transaction.description)
             recentItem.grid(column=2, row=rowIndex+2)
 
             # Laske uudet arvot kokonaistulolle ja -menolle (myös kuukausittaille arvoille)
@@ -110,7 +110,7 @@ class GUI:
 
         # Järjestä lista ja tulosta ikkunalle
         self.sortTransactions()
-        self.printTransactions(self.recent)
+        self.printTransactions()
 
     # Maksutapahtumien poisto
     def removeTransactions(self):
@@ -120,7 +120,7 @@ class GUI:
 
         # Järjestä lista ja tulosta ikkunalle
         self.sortTransactions()
-        self.printTransactions(self.recent)
+        self.printTransactions()
 
     # Tiedostosta tuonti
     def importTranscations(self):
@@ -129,7 +129,7 @@ class GUI:
 
         # Järjestä lista ja tulosta ikkunalle
         self.sortTransactions()
-        self.printTransactions(self.recent)
+        self.printTransactions()
 
     # --- Ohjelman pääikkunan luonti --- #
 
@@ -142,7 +142,7 @@ class GUI:
         # missä käyttäjä sulkee käyttöliittymän käyttöjärjestelmän ikkunamanagerin kautta
         root.protocol("WM_DELETE_WINDOW", self.exit)
 
-        # Kiinnitä käyttäjän data tähän instanssiin
+        # Kiinnitä käyttäjän data tähän olioon
         self.userData = userObject
 
         # Pääraamit ohjelmalle

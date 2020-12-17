@@ -24,6 +24,7 @@ class RemoveButton:
         self.state = False
 
     # Maksutapahtuman poistossa asetetaan False indeksin kohdalle
+    # Painamalla nappia uudestaan vaihdetaan poiston tilaa
     def removeTransaction(self, transactionList):
         if self.state == False:
             self.removeButton.configure(bg = "red")
@@ -130,6 +131,8 @@ def removeTransactionEventWindow(root, userData):
 
         # Käy läpi kaikki maksutapahtumat kopiolistasta
         for transactionIndex, transaction in enumerate(changedList):
+
+            # Tulosta maksutapahtumat joko tulo tai menoikkunalle riippuen määrän laadusta
             if transaction.amount >= 0:
                 removeTransactionButton = RemoveButton(incomeFrame, transactionIndex, toRemoveList)
                 printTransactionsToWindow(incomeFrame, transaction, incomeListIndex, removeTransactionButton)
@@ -144,8 +147,8 @@ def removeTransactionEventWindow(root, userData):
 
     # Poistotapahtuman tallennus päälistaan
     def returnRemovedTransactionList(root, changedList, toRemoveList, userData):
-        # Jos merkintälistaan on merkattu indeksin kohdalle True,
-        # aseta maksutapahtumalistaan False
+        # Jos merkintälistaan on merkattu indeksin i kohdalle True,
+        # aseta maksutapahtumalistaan indeksin i kohdalle False
         for index, state in enumerate(toRemoveList):
             if state == True:
                 changedList[index] = False
@@ -161,6 +164,7 @@ def removeTransactionEventWindow(root, userData):
 
     # Tulosta poistotapahtumaikkunalle maksutapahtumat sekä niitä vastaava poistonappi
     def printTransactionsToWindow(masterWindow, transaction, listIndex, removeButton):
+        # Muuta aika merkkijonoksi ennen tulostusta
         dateText = transaction.date.strftime("%d.%m.%Y")
         recentItem = tk.Label(masterWindow, text=dateText)
         recentItem.grid(column=0, row=listIndex)
